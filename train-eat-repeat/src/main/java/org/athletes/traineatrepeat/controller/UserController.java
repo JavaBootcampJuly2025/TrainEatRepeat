@@ -1,7 +1,7 @@
 package org.athletes.traineatrepeat.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.athletes.traineatrepeat.dto.response.UserResponseDto;
+import org.athletes.traineatrepeat.repository.dto.UserDTO;
 import org.athletes.traineatrepeat.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,7 +13,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/user-data")
-    public UserResponseDto getUserData(@RequestParam String uuid, @RequestHeader String jwtToken) {
+    public UserDTO getUserData(@RequestParam String uuid, @RequestHeader String jwtToken) {
         return userService.getUser(uuid, jwtToken);
     }
 

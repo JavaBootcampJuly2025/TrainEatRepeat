@@ -1,11 +1,11 @@
 package org.athletes.traineatrepeat.repository;
 
-import org.athletes.traineatrepeat.model.TrainingRecord;
+import org.athletes.traineatrepeat.repository.dto.TrainingDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface TrainingRecordRepository extends JpaRepository<TrainingRecord, String> {
+public interface TrainingRecordRepository extends JpaRepository<TrainingDTO, String> {
 
-    public TrainingRecord getTrainingRecordById(String trainingRecordId);
+    public TrainingDTO getTrainingRecordById(String trainingRecordId);
 }
