@@ -1,13 +1,15 @@
 package org.athletes.traineatrepeat.model;
 
+import lombok.Builder;
 import java.time.LocalDate;
 
-public class MealRecord {
-    private String id;
-    private String foodName;
-    private int caloriesConsumed;
-    private float carbs;
-    private float protein;
-    private float fat;
-    private LocalDate date;
-}
+@Builder
+public record MealRecord (
+    String id,
+    String foodName,
+    int caloriesConsumed,
+    float carbs,
+    float protein,
+    float fat,
+    LocalDate date
+) {}
