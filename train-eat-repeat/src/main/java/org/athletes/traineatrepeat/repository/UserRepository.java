@@ -1,14 +1,15 @@
 package org.athletes.traineatrepeat.repository;
 
-import org.athletes.traineatrepeat.repository.model.UserDto;
+import org.athletes.traineatrepeat.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 
 @Component
-public interface UseRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> {
 
 
     //    Optional<User> ...  ????
 
 
-    public UserDto getUserById(Long id);
+    public User getUserById(Long id);
 }
