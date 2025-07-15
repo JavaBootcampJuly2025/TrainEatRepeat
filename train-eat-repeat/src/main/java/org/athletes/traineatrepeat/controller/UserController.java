@@ -16,5 +16,4 @@ public class UserController {
     public UserResponse getUserData(@RequestParam String uuid, @RequestHeader String jwtToken) {
         return userService.getUser(uuid, jwtToken);
     }
-
 }
