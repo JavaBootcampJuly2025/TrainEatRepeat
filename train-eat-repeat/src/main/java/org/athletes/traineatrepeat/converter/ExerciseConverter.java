@@ -2,15 +2,24 @@ package org.athletes.traineatrepeat.converter;
 
 import org.athletes.traineatrepeat.model.request.ExerciseRequest;
 import org.athletes.traineatrepeat.model.response.ExerciseResponse;
+import org.athletes.traineatrepeat.repository.dto.ExerciseDTO;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ExerciseConverter {
-    public ExerciseResponse toResponse(ExerciseResponse user) {
-        // TODO: introduce logic to parse model to response
-        return null;
+
+    public ExerciseDTO fromRequest(ExerciseRequest request) {
+        return ExerciseDTO.builder()
+                .name(request.name())
+                .MET(request.MET())
+                .build();
     }
 
-    public ExerciseResponse fromRequest(ExerciseRequest user) {
-        // TODO: introduce logic to parse model from request
-        return null;
+    public ExerciseResponse toResponse(ExerciseDTO dto) {
+        return new ExerciseResponse(
+                dto.id(),
+                dto.name(),
+                dto.MET()
+        );
     }
 }

@@ -1,13 +1,13 @@
 package org.athletes.traineatrepeat.repository;
 
 import org.athletes.traineatrepeat.repository.dto.ExerciseDTO;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+@Repository
+public class ExerciseRepository {
 
-public interface ExerciseRepository extends JpaRepository<ExerciseDTO, Long> {
-
-    public ExerciseDTO getExerciseById(Long id);
-    Optional<ExerciseDTO> getExerciseByName(String name);
-
+    public ExerciseDTO save(ExerciseDTO dto) {
+        // TODO: Implement save to database logic
+        return dto;
+    }
 }
