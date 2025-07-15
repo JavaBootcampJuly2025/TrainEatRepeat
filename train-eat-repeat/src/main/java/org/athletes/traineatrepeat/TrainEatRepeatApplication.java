@@ -9,5 +9,4 @@ public class TrainEatRepeatApplication {
     public static void main(String[] args) {
         SpringApplication.run(TrainEatRepeatApplication.class, args);
     }
-
 }
