@@ -1,7 +1,6 @@
 package org.athletes.traineatrepeat.repository;
 
 import org.athletes.traineatrepeat.model.MealRecord;
-import org.athletes.traineatrepeat.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Component;
 

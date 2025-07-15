@@ -3,7 +3,6 @@ package org.athletes.traineatrepeat.controller;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.dto.response.MealRecordRequest;
 import org.athletes.traineatrepeat.dto.response.MealRecordResponse;
-import org.athletes.traineatrepeat.model.MealRecord;
 import org.athletes.traineatrepeat.service.MealRecordService;
 import org.springframework.web.bind.annotation.*;
 
