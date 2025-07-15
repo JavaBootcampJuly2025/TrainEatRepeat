@@ -1,21 +1,22 @@
 package org.athletes.traineatrepeat.service;
 
 import lombok.RequiredArgsConstructor;
-import org.athletes.traineatrepeat.model.response.UserResponse;
-import org.athletes.traineatrepeat.repository.UseRepository;
-import org.athletes.traineatrepeat.service.converter.UserConverter;
+import org.athletes.traineatrepeat.dto.response.UserResponseDto;
+import org.athletes.traineatrepeat.repository.UserRepository;
+import org.athletes.traineatrepeat.model.User;
+import org.athletes.traineatrepeat.converter.UserConverter;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UseRepository useRepository;
+    private final UserRepository useRepository;
     private final UserConverter userConverter;
 
-    public UserResponse getUser(String uuid, String jwtToken) {
+    public UserResponseDto getUser(String uuid, String jwtToken) {
         // TODO: implement logic related to JWT token in scope of TER-3
-        var userDto = useRepository.getUserById(uuid);
+        User userDto = useRepository.getUserById(Long.parseLong(uuid));
         return userConverter.convertToUserResponse(userDto);
     }
 }

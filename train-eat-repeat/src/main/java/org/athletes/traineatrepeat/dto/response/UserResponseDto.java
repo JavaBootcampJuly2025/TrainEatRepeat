@@ -1,9 +1,9 @@
-package org.athletes.traineatrepeat.model.response;
+package org.athletes.traineatrepeat.dto.response;
 
 import lombok.Builder;
 
 @Builder
-public record UserResponse(
+public record UserResponseDto(
         // TODO: introduce user fields in scope of TER-3
 ) {
 }
