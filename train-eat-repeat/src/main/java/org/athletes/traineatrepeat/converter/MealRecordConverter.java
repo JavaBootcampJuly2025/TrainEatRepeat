@@ -1,17 +1,18 @@
 package org.athletes.traineatrepeat.converter;
 
-import org.athletes.traineatrepeat.dto.response.MealRecordRequest;
-import org.athletes.traineatrepeat.dto.response.MealRecordResponse;
-import org.athletes.traineatrepeat.model.MealRecord;
+import org.athletes.traineatrepeat.model.request.MealRecordRequest;
+import org.athletes.traineatrepeat.model.response.MealRecordResponse;
+import org.athletes.traineatrepeat.repository.dto.MealDTO;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MealRecordConverter {
-
-    public static MealRecord fromRequest(MealRecordRequest request) {
+    public MealDTO fromRequest(MealRecordRequest request) {
         // TODO: introduce logic to parse model from request
-        return new MealRecord();
+        return null;
     }
 
-    public static MealRecordResponse toResponse(MealRecord mealRecord) {
+    public MealRecordResponse toResponse(MealDTO mealDTO) {
         return new MealRecordResponse(
             // TODO: introduce logic to make MealRecordResponse
         );
