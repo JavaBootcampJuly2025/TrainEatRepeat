@@ -11,12 +11,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserRepository useRepository;
     private final UserConverter userConverter;
 
     public UserResponse getUser(String uuid, String jwtToken) {
         // TODO: implement logic related to JWT token in scope of TER-3
-        UserResponse userResponse = userRepository.getUserById(Long.parseLong(uuid));
-        return userConverter.toResponse(userResponse);
+        UserDTO userDto = useRepository.getUserById(Long.parseLong(uuid));
+        return userConverter.convertToUserResponse(userDto);
     }
 }

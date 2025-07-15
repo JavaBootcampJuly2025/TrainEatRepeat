@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserConverter {
 
-    public UserResponse toResponse(UserResponse user) {
+    public UserResponse convertToUserResponse(UserDTO user) {
         // TODO: introduce logic to parse model from DTO to rest
         return null;
     }
