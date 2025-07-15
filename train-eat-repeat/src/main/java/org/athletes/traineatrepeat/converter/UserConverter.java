@@ -1,13 +1,13 @@
 package org.athletes.traineatrepeat.converter;
 
-import org.athletes.traineatrepeat.model.response.UserResponse;
-import org.athletes.traineatrepeat.repository.dto.UserDTO;
+import org.athletes.traineatrepeat.dto.response.UserResponseDto;
+import org.athletes.traineatrepeat.model.User;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UserConverter {
 
-    public UserResponse convertToUserResponse(UserDTO user) {
+    public UserResponseDto convertToUserResponse(User user) {
         // TODO: introduce logic to parse model from DTO to rest
         return null;
     }
