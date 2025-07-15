@@ -1,9 +1,9 @@
-package org.athletes.traineatrepeat.dto.response;
+package org.athletes.traineatrepeat.model.response;
 
 
 import lombok.Builder;
 
 @Builder
-public class ExerciseResponseDto {
+public class ExerciseResponse {
     // TODO: introduce exercise fields for the response
 }
