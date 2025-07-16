@@ -5,11 +5,12 @@ import java.time.LocalDate;
 
 @Builder
 public record MealDTO(
-    String id,
-    String foodName,
-    float caloriesConsumed,
-    float carbs,
-    float protein,
-    float fat,
-    LocalDate date
+        String id,
+        String userUuid,
+        String foodName,
+        float caloriesConsumed,
+        float carbs,
+        float protein,
+        float fat,
+        LocalDate date
 ) {}
