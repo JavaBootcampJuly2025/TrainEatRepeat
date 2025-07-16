@@ -10,7 +10,7 @@ Log your meals and workouts, then get calorie insights instantly. Whether it's a
 - **Statistics Dashboard** — View your progress and changes over time.
 - **JWT Authentication** — Secure login system.
 - **H2 In-Memory Database** — Lightweight data storage for development.
-- 
+
 ---
 
 ## Tech Stack
@@ -20,3 +20,5 @@ Log your meals and workouts, then get calorie insights instantly. Whether it's a
 - **Database**: H2
 
 ---
+
+<img width="818" height="786" alt="image" src="https://github.com/user-attachments/assets/450ea85f-190d-4aa3-a6cd-c4977cd48227" />
