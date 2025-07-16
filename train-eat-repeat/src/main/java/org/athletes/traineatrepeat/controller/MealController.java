@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/meal")
 public class MealController {
 
-    private final MealService mealRecordService;
+    private final MealService mealService;
 
     @PostMapping("/submit-food")
     public MealRecordResponse submitMeal(@RequestParam String uuid, @RequestBody MealRecordRequest request) {
-        return mealRecordService.submitMeal(uuid, request);
+        return mealService.submitMeal(uuid, request);
     }
 }
