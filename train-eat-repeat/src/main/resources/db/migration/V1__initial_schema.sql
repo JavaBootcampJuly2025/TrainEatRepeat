@@ -8,5 +8,6 @@ CREATE TABLE user
     weight              FLOAT,
     height              FLOAT,
     BMI                 FLOAT,
-    BMR                 FLOAT
+    BMR                 FLOAT,
+    role                VARCHAR(255)
 );
