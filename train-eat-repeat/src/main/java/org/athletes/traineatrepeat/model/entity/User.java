@@ -20,14 +20,15 @@ public class User {
 
     private String username;
     private String password;
-    private Integer age;
+    private int age;
     private String gender;
 
-    @ElementCollection
-    private List<String> chronicDiseases;
-
-    @ElementCollection
-    private List<String> foodPreferences;
+    //TODO: add together with training data
+//    @ElementCollection
+//    private List<String> chronicDiseases;
+    //TODO: add together with food data
+//    @ElementCollection
+//    private List<String> foodPreferences;
 
     private float weight;
     private float height;
