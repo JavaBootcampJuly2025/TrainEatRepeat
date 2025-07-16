@@ -1,5 +1,6 @@
 package org.athletes.traineatrepeat.service;
 
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.entity.User;
 import org.athletes.traineatrepeat.model.response.UserResponse;
@@ -12,12 +13,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository useRepository;
+    private final UserRepository userRepository;
     private final UserConverter userConverter;
 
     public UserDTO getUser(String uuid, String jwtToken) {
         // TODO: JWT validation
-        User user = useRepository.getUserByUuid(uuid);
+        User user = userRepository.getUserByUuid(uuid);
         return userConverter.convertToUserDTO(user);
     }
 

@@ -1,42 +1,20 @@
 package org.athletes.traineatrepeat.repository;
 
+
+import org.athletes.traineatrepeat.model.entity.Meal;
 import org.athletes.traineatrepeat.repository.dto.MealDTO;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Repository
-public class MealRecordRepository {
+public interface MealRecordRepository extends JpaRepository<Meal, String> {
 
-    private static Long idCounter = 0L;
+    List<Meal> findAllByUserUuidAndDate(String userUuid, LocalDate date);
 
-    public MealDTO save(MealDTO dto) {
-        String newId = (dto.id() == null || dto.id().isEmpty()) ? String.valueOf(++idCounter) : dto.id();
-
-        MealDTO savedDto = MealDTO.builder()
-                .id(newId)
-                .userUuid(dto.userUuid())
-                .foodName(dto.foodName())
-                .caloriesConsumed(dto.caloriesConsumed())
-                .carbs(dto.carbs())
-                .protein(dto.protein())
-                .fat(dto.fat())
-                .date(dto.date())
-                .build();
-
-        // TODO: Implement save logic
-        System.out.println(savedDto);
-        return savedDto;
-    }
-
-    public List<MealDTO> findByUserUuid(String userUuid) {
-        // TODO: Implement findByUserUuid logic
-        return List.of();
-    }
-
-    public Optional<MealDTO> findById(Long id) {
-        // TODO: Implement findById logic
-        return Optional.empty();
-    }
+    @Query("SELECT m FROM Meal m WHERE m.userUuid = :userUuid AND m.date BETWEEN :start AND :end")
+    List<Meal> findMealsByUserUuidAndDateBetween(String userUuid, LocalDate start, LocalDate end);
 }
