@@ -1,6 +1,12 @@
 package org.athletes.traineatrepeat.model.response;
 
-public record TrainingRecordResponse (
+import java.time.LocalDate;
 
+public record TrainingRecordResponse (
+        String id,
+        String exercise,
+        float duration,
+        float caloriesLost,
+        LocalDate date
 )
 {}

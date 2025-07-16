@@ -1,6 +1,11 @@
 package org.athletes.traineatrepeat.model.request;
 
-public record TrainingRecordRequest (
+import java.time.LocalDate;
 
+public record TrainingRecordRequest (
+        String exercise,
+        float duration,
+        float caloriesLost,
+        LocalDate date
 )
 {}
