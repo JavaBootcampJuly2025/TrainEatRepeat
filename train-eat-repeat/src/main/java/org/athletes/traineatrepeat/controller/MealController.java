@@ -1,6 +1,7 @@
 package org.athletes.traineatrepeat.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.request.MealRecordRequest;
 import org.athletes.traineatrepeat.model.response.MealRecordResponse;
 import org.athletes.traineatrepeat.service.MealService;
@@ -20,19 +21,9 @@ public class MealController {
         return mealService.submitMeal(uuid, request);
     }
 
-    @GetMapping("/todays-meals")
-    public List<MealRecordResponse> getTodaysMeals(@RequestParam String uuid) {
-        return mealService.getTodaysMealsForUser(uuid);
-    }
-
-    @GetMapping("/week-meals")
-    public List<MealRecordResponse> getThisWeeksMeals(@RequestParam String uuid) {
-        return mealService.getThisWeeksMeals(uuid);
-    }
-
-    @GetMapping("/month-meals")
-    public List<MealRecordResponse> getThisMonthsMeals(@RequestParam String uuid) {
-        return mealService.getThisMonthsMeals(uuid);
+    @GetMapping("/meals")
+    public List<MealRecordResponse> getTodaysMeals(@RequestParam String uuid, @RequestParam (required = false) TimePeriod timePeriod) {
+        return mealService.getMealsForUser(uuid, timePeriod);
     }
 
     @DeleteMapping("/{id}")

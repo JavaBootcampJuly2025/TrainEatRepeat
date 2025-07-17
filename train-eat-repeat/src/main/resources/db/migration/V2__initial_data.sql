@@ -7,7 +7,7 @@ VALUES ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'password123', 28, '
        ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'buildIt!', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'admin');
 
 
-INSERT INTO mealrecords (id, user_uuid, food_name, calories, carbs, protein, fat, date)
+INSERT INTO MEALRECORDS (id, uuid, foodName, calories, carbs, protein, fat, date)
 VALUES
     ('a1b2c3d4-e5f6-7890-abcd-1234567890ab', '550e8400-e29b-41d4-a716-446655440000', 'Chicken Salad', 350, 10, 30, 15, '2025-07-15'),
     ('b2c3d4e5-f6a7-8901-bcde-2345678901bc', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Pasta', 500, 60, 15, 10, '2025-07-15'),

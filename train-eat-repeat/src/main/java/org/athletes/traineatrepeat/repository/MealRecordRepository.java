@@ -1,7 +1,6 @@
 package org.athletes.traineatrepeat.repository;
 
 
-import org.athletes.traineatrepeat.model.entity.Meal;
 import org.athletes.traineatrepeat.repository.dto.MealDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,10 +10,11 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface MealRecordRepository extends JpaRepository<Meal, String> {
+public interface MealRecordRepository extends JpaRepository<MealDTO, String> {
 
-    List<Meal> findAllByUserUuidAndDate(String userUuid, LocalDate date);
+    List<MealDTO> findAllByUuidAndDate(String uuid, LocalDate date);
+    List<MealDTO> findAllByUuid(String uuid);
 
-    @Query("SELECT m FROM Meal m WHERE m.userUuid = :userUuid AND m.date BETWEEN :start AND :end")
-    List<Meal> findMealsByUserUuidAndDateBetween(String userUuid, LocalDate start, LocalDate end);
+    @Query("SELECT m FROM MealDTO m WHERE m.uuid = :uuid AND m.date BETWEEN :start AND :end")
+    List<MealDTO> findMealsByUuidAndDateBetween(String uuid, LocalDate start, LocalDate end);
 }

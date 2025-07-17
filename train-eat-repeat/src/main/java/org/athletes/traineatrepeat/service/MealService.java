@@ -2,7 +2,7 @@ package org.athletes.traineatrepeat.service;
 
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.converter.MealRecordConverter;
-import org.athletes.traineatrepeat.model.entity.Meal;
+import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.request.MealRecordRequest;
 import org.athletes.traineatrepeat.model.response.MealRecordResponse;
 import org.athletes.traineatrepeat.repository.MealRecordRepository;
@@ -20,17 +20,34 @@ public class MealService {
     private final MealRecordConverter mealRecordConverter;
 
     public MealRecordResponse submitMeal(String uuid, MealRecordRequest request) {
-        Meal mealToSave = mealRecordConverter.fromRequestToEntity(request, uuid);
-        Meal savedMeal = mealRecordRepository.save(mealToSave);
+        var mealToSave = mealRecordConverter.fromRequestToEntity(request, uuid);
+        var savedMeal = mealRecordRepository.save(mealToSave);
         return mealRecordConverter.toResponse(savedMeal);
     }
 
-    public List<MealRecordResponse> getTodaysMealsForUser(String uuid) {
-        LocalDate today = LocalDate.now();
-        List<Meal> todaysMeals = mealRecordRepository.findAllByUserUuidAndDate(uuid, today);
-        return todaysMeals.stream()
+    /**
+     * Retrieves meals for the users depending on the time period (day, week, month)
+     *
+     * @param uuid user's id
+     * @param timePeriod time period
+     * @return lists of meals per time period
+     */
+    public List<MealRecordResponse> getMealsForUser(String uuid, TimePeriod timePeriod) {
+        var meals = getMealsFromTimePeriod(uuid, timePeriod);
+        return meals.stream()
                 .map(mealRecordConverter::toResponse)
                 .toList();
+    }
+
+    private List<MealDTO> getMealsFromTimePeriod(String uuid, TimePeriod timePeriod) {
+        if (timePeriod == null) {
+            return mealRecordRepository.findAllByUuid(uuid);
+        }
+        return switch (timePeriod) {
+            case DAY -> getMealsForToday(uuid);
+            case WEEK -> getMealsForWeek(uuid);
+            case MONTH -> getMealsForMonth(uuid);
+        };
     }
 
     public void deleteMealById(String mealId) {
@@ -38,7 +55,7 @@ public class MealService {
     }
 
     public MealRecordResponse updateMeal(String mealId, MealRecordRequest request) {
-        Meal existingMeal = mealRecordRepository.findById(mealId)
+        var existingMeal = mealRecordRepository.findById(mealId)
                 .orElseThrow(() -> new RuntimeException("Meal not found"));
 
         existingMeal.setFoodName(request.foodName());
@@ -48,31 +65,28 @@ public class MealService {
         existingMeal.setFat(request.fat());
         existingMeal.setDate(request.date());
 
-        Meal savedMeal = mealRecordRepository.save(existingMeal);
+        var savedMeal = mealRecordRepository.save(existingMeal);
         return mealRecordConverter.toResponse(savedMeal);
     }
 
-    public List<MealRecordResponse> getThisWeeksMeals(String uuid) {
+    private List<MealDTO> getMealsForToday(String uuid) {
+        LocalDate today = LocalDate.now();
+        return mealRecordRepository.findAllByUuidAndDate(uuid, today);
+    }
+
+    private List<MealDTO> getMealsForWeek(String uuid) {
         LocalDate today = LocalDate.now();
         LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
         LocalDate endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
 
-        List<Meal> meals = mealRecordRepository.findMealsByUserUuidAndDateBetween(uuid, startOfWeek, endOfWeek);
-
-        return meals.stream()
-                .map(mealRecordConverter::toResponse)
-                .toList();
+        return mealRecordRepository.findMealsByUuidAndDateBetween(uuid, startOfWeek, endOfWeek);
     }
 
-    public List<MealRecordResponse> getThisMonthsMeals(String uuid) {
+    private List<MealDTO> getMealsForMonth(String uuid) {
         LocalDate today = LocalDate.now();
         LocalDate startOfMonth = today.withDayOfMonth(1);
         LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 
-        List<Meal> meals = mealRecordRepository.findMealsByUserUuidAndDateBetween(uuid, startOfMonth, endOfMonth);
-
-        return meals.stream()
-                .map(mealRecordConverter::toResponse)
-                .toList();
+        return mealRecordRepository.findMealsByUuidAndDateBetween(uuid, startOfMonth, endOfMonth);
     }
 }
