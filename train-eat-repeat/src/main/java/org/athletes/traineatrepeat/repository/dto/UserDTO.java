@@ -3,9 +3,6 @@ package org.athletes.traineatrepeat.repository.dto;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.List;
-import java.util.UUID;
-
 @Entity
 @Table(name = "users")
 @Data

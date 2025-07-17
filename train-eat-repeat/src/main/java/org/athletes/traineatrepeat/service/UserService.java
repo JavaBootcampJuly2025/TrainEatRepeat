@@ -1,9 +1,9 @@
 package org.athletes.traineatrepeat.service;
 
 import lombok.RequiredArgsConstructor;
+import org.athletes.traineatrepeat.converter.UserConverter;
 import org.athletes.traineatrepeat.model.response.UserResponse;
 import org.athletes.traineatrepeat.repository.UserRepository;
-import org.athletes.traineatrepeat.converter.UserConverter;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

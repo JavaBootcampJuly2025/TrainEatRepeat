@@ -1,10 +1,18 @@
 package org.athletes.traineatrepeat.repository.dto;
 
-import lombok.Builder;
+import jakarta.persistence.*;
+import lombok.*;
 
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-public record ExerciseDTO(
-        String id,
-        String name,
-        float MET
-) {}
+@Table(name = "EXERCISES")
+public class ExerciseDTO {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+    private String name;
+    private float MET;
+}

@@ -2,7 +2,6 @@ package org.athletes.traineatrepeat.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.response.UserResponse;
-import org.athletes.traineatrepeat.repository.dto.UserDTO;
 import org.athletes.traineatrepeat.service.UserService;
 import org.springframework.web.bind.annotation.*;
 

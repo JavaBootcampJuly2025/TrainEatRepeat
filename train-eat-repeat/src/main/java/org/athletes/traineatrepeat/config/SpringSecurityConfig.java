@@ -6,7 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.DefaultSecurityFilterChain;
 
-@Configuration 
+@Configuration
 public class SpringSecurityConfig {
     @Bean
     public DefaultSecurityFilterChain filterChain(HttpSecurity http) throws Exception {

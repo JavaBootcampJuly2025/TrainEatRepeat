@@ -1,8 +1,7 @@
 package org.athletes.traineatrepeat.converter;
 
-import org.athletes.traineatrepeat.repository.dto.UserDTO;
 import org.athletes.traineatrepeat.model.response.UserResponse;
-
+import org.athletes.traineatrepeat.repository.dto.UserDTO;
 import org.springframework.stereotype.Component;
 
 @Component
