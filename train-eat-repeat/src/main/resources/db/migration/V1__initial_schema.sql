@@ -12,17 +12,17 @@ CREATE TABLE USERS
     role     VARCHAR(255)
 );
 
-CREATE TABLE mealrecords
+CREATE TABLE "MEALRECORDS"
 (
     id        VARCHAR(36) PRIMARY KEY,
-    user_uuid VARCHAR(36),
-    food_name VARCHAR(255),
+    uuid       VARCHAR(36),
+    foodName VARCHAR(255),
     calories  FLOAT,
     carbs     FLOAT,
     protein   FLOAT,
     fat       FLOAT,
     date      DATE,
-    CONSTRAINT fk_user FOREIGN KEY (user_uuid) REFERENCES users(uuid) ON DELETE CASCADE
+    CONSTRAINT fk_user FOREIGN KEY (uuid) REFERENCES USERS(uuid) ON DELETE CASCADE
 );
 
 
