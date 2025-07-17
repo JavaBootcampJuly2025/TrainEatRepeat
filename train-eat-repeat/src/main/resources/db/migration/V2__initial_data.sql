@@ -1,4 +1,4 @@
-INSERT INTO users (uuid, username, password, age, gender, weight, height, BMI, BMR, role)
+INSERT INTO USERS (uuid, username, password, age, gender, weight, height, BMI, BMR, role)
 VALUES ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'password123', 28, 'Male', 75.0, 180.0, 23.15, 1755.0, 'admin'),
        ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'jane_smith', 'securepass', 25, 'Female', 60.0, 165.0, 22.04, 1400.0, 'admin'),
        ('123e4567-e89b-12d3-a456-426614174000', 'alex_fitness', 'abc123xyz', 32, 'Male', 82.0, 178.0, 25.88, 1850.0, 'user'),
