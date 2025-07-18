@@ -6,14 +6,12 @@ VALUES ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'password123', 28, '
        ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'buildIt!', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'user');
 
 
-INSERT INTO MEALRECORDS (id, uuid, food_name, calories, carbs, protein, fat, date)
-VALUES
-    ('a1b2c3d4-e5f6-7890-abcd-1234567890ab', '550e8400-e29b-41d4-a716-446655440000', 'Chicken Salad', 350, 10, 30, 15, '2025-07-15'),
-    ('b2c3d4e5-f6a7-8901-bcde-2345678901bc', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Pasta', 500, 60, 15, 10, '2025-07-15'),
-    ('c3d4e5f6-a7b8-9012-cdef-3456789012cd', '123e4567-e89b-12d3-a456-426614174000', 'Protein Shake', 200, 5, 25, 5, '2025-07-15'),
-    ('d4e5f6a7-b8c9-0123-def0-4567890123de', '9c858901-8a57-4791-81fe-4c455b099bc9', 'Fruit Bowl', 150, 30, 2, 1, '2025-07-15'),
-    ('e5f6a7b8-c9d0-1234-ef01-5678901234ef', '16fd2706-8baf-433b-82eb-8c7fada847da', 'Steak', 700, 0, 50, 50, '2025-07-15');
-
+INSERT INTO MEALRECORDS (id, uuid, food_name, calories, carbs, protein, fat, weight_in_grams, date)
+VALUES  ('a1b2c3d4-e5f6-7890-abcd-1234567890ab', '550e8400-e29b-41d4-a716-446655440000', 'Chicken Salad', 350, 10, 30, 15, 250.0, '2025-07-15'),
+        ('b2c3d4e5-f6a7-8901-bcde-2345678901bc', 'f47ac10b-58cc-4372-a567-0e02b2c3d479', 'Pasta', 500, 60, 15, 10, 180.0, '2025-07-15'),
+        ('c3d4e5f6-a7b8-9012-cdef-3456789012cd', '123e4567-e89b-12d3-a456-426614174000', 'Protein Shake', 200, 5, 25, 5, 300.0, '2025-07-15'),
+        ('d4e5f6a7-b8c9-0123-def0-4567890123de', '9c858901-8a57-4791-81fe-4c455b099bc9', 'Fruit Bowl', 150, 30, 2, 1, 200.0, '2025-07-15'),
+        ('e5f6a7b8-c9d0-1234-ef01-5678901234ef', '16fd2706-8baf-433b-82eb-8c7fada847da', 'Steak', 700, 0, 50, 50, 225.0, '2025-07-15');
 
 INSERT INTO TRAININGRECORDS (id, uuid, exercise, duration, calories_lost, date)
 VALUES

@@ -14,14 +14,15 @@ CREATE TABLE USERS
 
 CREATE TABLE MEALRECORDS
 (
-    id        VARCHAR(36) PRIMARY KEY,
-    uuid      VARCHAR(36),
-    food_name VARCHAR(255),
-    calories  FLOAT,
-    carbs     FLOAT,
-    protein   FLOAT,
-    fat       FLOAT,
-    date      DATE,
+    id               VARCHAR(36) PRIMARY KEY,
+    uuid             VARCHAR(36),
+    food_name        VARCHAR(255),
+    calories         FLOAT,
+    carbs            FLOAT,
+    protein          FLOAT,
+    fat              FLOAT,
+    weight_in_grams  FLOAT      NOT NULL DEFAULT 100.0,
+    date             DATE,
     CONSTRAINT fk_user FOREIGN KEY (uuid) REFERENCES USERS (uuid) ON DELETE CASCADE
 );
 
