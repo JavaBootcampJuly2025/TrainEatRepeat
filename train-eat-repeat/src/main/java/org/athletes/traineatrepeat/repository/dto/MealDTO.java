@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,15 +19,23 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class MealDTO {
-
     @Id
-    @Column
     private String id;
+
     private String uuid;
+
+    @NotNull
     private String foodName;
+
     private float calories;
     private float carbs;
     private float protein;
     private float fat;
+
+    @Column(name = "weight_in_grams", nullable = false)
+    private float weightInGrams;
+
     private LocalDate date;
 }
+
+

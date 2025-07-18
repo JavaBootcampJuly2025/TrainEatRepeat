@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,13 +25,13 @@ public class MealService {
     private final MealRecordConverter mealRecordConverter;
     private final UsdaClient usdaClient;
 
-    public MealRecordResponse submitMeal(String uuid, MealRecordRequest request) {
-        var usdaResponse = usdaClient.searchFood(request.foodName());
+    private Map<String, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
+        var usdaResponse = usdaClient.searchFood(foodName);
 
-        float calories = request.caloriesConsumed();
-        float carbs = request.carbs();
-        float protein = request.protein();
-        float fat = request.fat();
+        float calories = 0.0f;
+        float carbs = 0.0f;
+        float protein = 0.0f;
+        float fat = 0.0f;
 
         if (usdaResponse != null && usdaResponse.getFoods() != null && !usdaResponse.getFoods().isEmpty()) {
             var food = usdaResponse.getFoods().get(0);
@@ -43,23 +45,31 @@ public class MealService {
             }
         }
 
-        float weight = request.weightInGrams() == 0 ? 100.0f : request.weightInGrams();
-        float factor = weight / 100.0f;
+        float actualWeight = weightInGrams == 0 ? 100.0f : weightInGrams;
+        float factor = actualWeight / 100.0f;
 
-        calories *= factor;
-        carbs *= factor;
-        protein *= factor;
-        fat *= factor;
+        Map<String, Float> nutrition = new HashMap<>();
+        nutrition.put("calories", calories * factor);
+        nutrition.put("carbs", carbs * factor);
+        nutrition.put("protein", protein * factor);
+        nutrition.put("fat", fat * factor);
+
+        return nutrition;
+    }
+
+    public MealRecordResponse submitMeal(String uuid, MealRecordRequest request) {
+        Map<String, Float> nutrition = calculateNutritionalValues(request.foodName(), request.weightInGrams());
 
         var mealToSave = MealDTO.builder()
                 .id(UUID.randomUUID().toString())
                 .uuid(uuid)
                 .foodName(request.foodName())
-                .calories(calories)
-                .carbs(carbs)
-                .protein(protein)
-                .fat(fat)
-                .date(request.date())
+                .calories(nutrition.get("calories"))
+                .carbs(nutrition.get("carbs"))
+                .protein(nutrition.get("protein"))
+                .fat(nutrition.get("fat"))
+                .weightInGrams(request.weightInGrams())
+                .date(request.date() != null ? request.date() : LocalDate.now())
                 .build();
 
         var savedMeal = mealRecordRepository.save(mealToSave);
@@ -112,14 +122,17 @@ public class MealService {
 
     public MealRecordResponse updateMeal(String mealId, MealRecordRequest request) {
         var existingMeal = mealRecordRepository.findById(mealId)
-                .orElseThrow(() -> new RuntimeException("Meal not found"));
+                .orElseThrow(() -> new RuntimeException("Meal not found with ID: " + mealId));
 
         existingMeal.setFoodName(request.foodName());
-        existingMeal.setCalories(request.caloriesConsumed());
-        existingMeal.setCarbs(request.carbs());
-        existingMeal.setProtein(request.protein());
-        existingMeal.setFat(request.fat());
-        existingMeal.setDate(request.date());
+        existingMeal.setDate(request.date() != null ? request.date() : LocalDate.now());
+
+        Map<String, Float> nutrition = calculateNutritionalValues(request.foodName(), request.weightInGrams());
+
+        existingMeal.setCalories(nutrition.get("calories"));
+        existingMeal.setCarbs(nutrition.get("carbs"));
+        existingMeal.setProtein(nutrition.get("protein"));
+        existingMeal.setFat(nutrition.get("fat"));
 
         var savedMeal = mealRecordRepository.save(existingMeal);
         return mealRecordConverter.toResponse(savedMeal);

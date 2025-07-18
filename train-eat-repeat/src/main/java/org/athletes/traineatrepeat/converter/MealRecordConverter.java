@@ -9,20 +9,6 @@ import java.util.UUID;
 
 @Component
 public class MealRecordConverter {
-
-    public MealDTO fromRequestToEntity(MealRecordRequest request, String uuid) {
-        return MealDTO.builder()
-                .id(UUID.randomUUID().toString())
-                .uuid(uuid)
-                .foodName(request.foodName())
-                .calories(request.caloriesConsumed())
-                .carbs(request.carbs())
-                .protein(request.protein())
-                .fat(request.fat())
-                .date(request.date())
-                .build();
-    }
-
     public MealRecordResponse toResponse(MealDTO meal) {
         return  MealRecordResponse.builder()
                 .id(meal.getId())
@@ -32,6 +18,7 @@ public class MealRecordConverter {
                 .carbs(meal.getCarbs())
                 .protein(meal.getProtein())
                 .fat(meal.getFat())
+                .weightInGrams(meal.getWeightInGrams())
                 .date(meal.getDate())
                 .build();
     }

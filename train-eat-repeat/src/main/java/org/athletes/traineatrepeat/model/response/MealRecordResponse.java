@@ -13,5 +13,6 @@ public record MealRecordResponse(
         float carbs,
         float protein,
         float fat,
+        float weightInGrams,
         LocalDate date
-) {}
+) { }
