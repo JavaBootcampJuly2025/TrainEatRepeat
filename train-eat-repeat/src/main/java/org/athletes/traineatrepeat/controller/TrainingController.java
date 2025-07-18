@@ -21,8 +21,8 @@ public class TrainingController {
         return trainingService.submitTraining(request);
     }
 
-    @GetMapping("/all")
-    public List<TrainingRecordResponse> getTodaysTrainings(@RequestParam String uuid, @RequestParam (required = false) TimePeriod timePeriod) {
+    @GetMapping("/trainings")
+    public List<TrainingRecordResponse> getTrainings(@RequestParam String uuid, @RequestParam (required = false) TimePeriod timePeriod) {
         return trainingService.getTrainingsForUser(uuid, timePeriod);
     }
 

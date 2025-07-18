@@ -5,6 +5,7 @@ import org.athletes.traineatrepeat.converter.TrainingRecordConverter;
 import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.request.TrainingRecordRequest;
 import org.athletes.traineatrepeat.model.response.TrainingRecordResponse;
+import org.athletes.traineatrepeat.model.response.UserTrainingStatisticsResponse;
 import org.athletes.traineatrepeat.repository.ExerciseRepository;
 import org.athletes.traineatrepeat.repository.TrainingRecordRepository;
 import org.athletes.traineatrepeat.repository.UserRepository;
@@ -79,6 +80,33 @@ public class TrainingService {
         return trainings.stream()
                 .map(trainingRecordConverter::toResponse)
                 .toList();
+    }
+
+    public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
+        var trainings = getTrainingsFromTimePeriod(uuid, period);
+        double avgCaloriesBurned = trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
+
+        int daysInPeriod = 1;
+        if (period != null) {
+            LocalDate today = LocalDate.now();
+            switch (period) {
+                case WEEK -> {
+                    LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+                    daysInPeriod = (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfWeek, today) + 1);
+                }
+                case MONTH -> {
+                    LocalDate startOfMonth = today.withDayOfMonth(1);
+                    daysInPeriod = (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
+                }
+            }
+        }
+
+        double avgSessions = trainings.size() / (double) daysInPeriod;
+
+        return UserTrainingStatisticsResponse.builder()
+                .avgCaloriesBurnedPerSession(avgCaloriesBurned)
+                .avgPerDaySessions(avgSessions)
+                .build();
     }
 
     private List<TrainingDTO> getTrainingsFromTimePeriod(String uuid, TimePeriod timePeriod) {

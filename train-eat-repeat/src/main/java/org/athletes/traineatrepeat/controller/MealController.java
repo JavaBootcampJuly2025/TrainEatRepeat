@@ -22,7 +22,7 @@ public class MealController {
     }
 
     @GetMapping("/meals")
-    public List<MealRecordResponse> getTodaysMeals(@RequestParam String uuid, @RequestParam (required = false) TimePeriod timePeriod) {
+    public List<MealRecordResponse> getMeals(@RequestParam String uuid, @RequestParam (required = false) TimePeriod timePeriod) {
         return mealService.getMealsForUser(uuid, timePeriod);
     }
 
