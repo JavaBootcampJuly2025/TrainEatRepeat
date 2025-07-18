@@ -26,6 +26,7 @@ public class MealRecordConverter {
     public MealRecordResponse toResponse(MealDTO meal) {
         return  MealRecordResponse.builder()
                 .id(meal.getId())
+                .uuid(meal.getUuid())
                 .foodName(meal.getFoodName())
                 .calories(meal.getCalories())
                 .carbs(meal.getCarbs())

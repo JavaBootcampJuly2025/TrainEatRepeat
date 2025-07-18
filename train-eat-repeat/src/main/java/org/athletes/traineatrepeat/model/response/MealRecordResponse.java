@@ -7,7 +7,7 @@ import java.time.LocalDate;
 @Builder
 public record MealRecordResponse(
         String id,
-        String userUuid,
+        String uuid,
         String foodName,
         float calories,
         float carbs,
