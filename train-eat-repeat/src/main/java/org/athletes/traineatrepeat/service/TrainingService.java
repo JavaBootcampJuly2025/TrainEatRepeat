@@ -5,12 +5,15 @@ import org.athletes.traineatrepeat.converter.TrainingRecordConverter;
 import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.request.TrainingRecordRequest;
 import org.athletes.traineatrepeat.model.response.TrainingRecordResponse;
+import org.athletes.traineatrepeat.repository.ExerciseRepository;
 import org.athletes.traineatrepeat.repository.TrainingRecordRepository;
+import org.athletes.traineatrepeat.repository.UserRepository;
 import org.athletes.traineatrepeat.repository.dto.TrainingDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,11 +21,50 @@ public class TrainingService {
 
     private final TrainingRecordRepository trainingRecordRepository;
     private final TrainingRecordConverter trainingRecordConverter;
+    private final ExerciseRepository exerciseRepository;
+    private final UserRepository userRepository;
 
     public TrainingRecordResponse submitTraining(TrainingRecordRequest request) {
+        var user = userRepository.findById(request.uuid())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        var exercise = exerciseRepository.findByNameIgnoreCase(request.exercise())
+                .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
+
+        float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+
         var trainingToSave = trainingRecordConverter.fromRequest(request);
+        trainingToSave.setId(UUID.randomUUID().toString());
+        trainingToSave.setUuid(user.getUuid());
+        trainingToSave.setCaloriesLost(calories);
+
         var savedTraining = trainingRecordRepository.save(trainingToSave);
         return trainingRecordConverter.toResponse(savedTraining);
+    }
+
+    public TrainingRecordResponse updateTrainingById(String trainingId, TrainingRecordRequest request) {
+        var existingTraining = trainingRecordRepository.findById(trainingId)
+                .orElseThrow(() -> new RuntimeException("Training not found"));
+
+        var user = userRepository.findById(request.uuid())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        var exercise = exerciseRepository.findByNameIgnoreCase(request.exercise())
+                .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
+
+        float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+
+        existingTraining.setExercise(request.exercise());
+        existingTraining.setDuration(request.duration());
+        existingTraining.setCaloriesLost(calories);
+        existingTraining.setDate(request.date());
+
+        var updatedTraining = trainingRecordRepository.save(existingTraining);
+        return trainingRecordConverter.toResponse(updatedTraining);
+    }
+
+    private float calculateCalories(float met, float weight, float durationInMinutes) {
+        return (met * weight * 3.5f * durationInMinutes) / 200f;
     }
 
     /**
@@ -52,19 +94,6 @@ public class TrainingService {
 
     public void deleteTrainingById(String trainingId) {
         trainingRecordRepository.deleteById(trainingId);
-    }
-
-    public TrainingRecordResponse updateTrainingById(String trainingId, TrainingRecordRequest request) {
-        var existingTraining = trainingRecordRepository.findById(trainingId)
-                .orElseThrow(() -> new RuntimeException("Training not found"));
-
-        existingTraining.setExercise(request.exercise());
-        existingTraining.setDuration(request.duration());
-        existingTraining.setCaloriesLost(request.caloriesLost());
-        existingTraining.setDate(request.date());
-
-        var updatedTraining = trainingRecordRepository.save(existingTraining);
-        return trainingRecordConverter.toResponse(updatedTraining);
     }
 
     private List<TrainingDTO> getTrainingsForToday(String uuid) {
