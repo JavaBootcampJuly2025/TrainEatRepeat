@@ -96,12 +96,14 @@ public class MealService {
         double avgFat = meals.stream().mapToDouble(MealDTO::getFat).average().orElse(0);
         double avgCarbs = meals.stream().mapToDouble(MealDTO::getCarbs).average().orElse(0);
         double avgCalories = meals.stream().mapToDouble(MealDTO::getCalories).average().orElse(0);
+        double avgWeightInGrams = meals.stream().mapToDouble(MealDTO::getWeightInGrams).average().orElse(0);
 
         return UserNutritionStatisticsResponse.builder()
                 .avgProtein(avgProtein)
                 .avgFat(avgFat)
                 .avgCarbs(avgCarbs)
                 .avgCalories(avgCalories)
+                .avgWeightInGrams(avgWeightInGrams)
                 .build();
     }
 
