@@ -6,6 +6,8 @@ import java.time.LocalDate;
 
 @Builder
 public record MealRecordRequest(
+        String id,
+        String uuid,
         String foodName,
         float caloriesConsumed,
         float carbs,

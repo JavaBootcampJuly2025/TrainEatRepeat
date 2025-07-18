@@ -5,6 +5,7 @@ import org.athletes.traineatrepeat.converter.MealRecordConverter;
 import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.request.MealRecordRequest;
 import org.athletes.traineatrepeat.model.response.MealRecordResponse;
+import org.athletes.traineatrepeat.model.response.UserNutritionStatisticsResponse;
 import org.athletes.traineatrepeat.api.UsdaClient;
 import org.athletes.traineatrepeat.repository.MealRecordRepository;
 import org.athletes.traineatrepeat.repository.dto.MealDTO;
@@ -65,11 +66,33 @@ public class MealService {
         return mealRecordConverter.toResponse(savedMeal);
     }
 
+    /**
+     * Retrieves meals for the users depending on the time period (day, week, month)
+     *
+     * @param uuid user's id
+     * @param timePeriod time period
+     * @return lists of meals per time period
+     */
     public List<MealRecordResponse> getMealsForUser(String uuid, TimePeriod timePeriod) {
         var meals = getMealsFromTimePeriod(uuid, timePeriod);
         return meals.stream()
                 .map(mealRecordConverter::toResponse)
                 .toList();
+    }
+
+    public UserNutritionStatisticsResponse getNutritionStatistics(String uuid, TimePeriod period) {
+        var meals = getMealsFromTimePeriod(uuid, period);
+        double avgProtein = meals.stream().mapToDouble(MealDTO::getProtein).average().orElse(0);
+        double avgFat = meals.stream().mapToDouble(MealDTO::getFat).average().orElse(0);
+        double avgCarbs = meals.stream().mapToDouble(MealDTO::getCarbs).average().orElse(0);
+        double avgCalories = meals.stream().mapToDouble(MealDTO::getCalories).average().orElse(0);
+
+        return UserNutritionStatisticsResponse.builder()
+                .avgProtein(avgProtein)
+                .avgFat(avgFat)
+                .avgCarbs(avgCarbs)
+                .avgCalories(avgCalories)
+                .build();
     }
 
     private List<MealDTO> getMealsFromTimePeriod(String uuid, TimePeriod timePeriod) {
