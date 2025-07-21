@@ -13,6 +13,7 @@ import org.athletes.traineatrepeat.repository.ExerciseRepository;
 import org.athletes.traineatrepeat.repository.TrainingRecordRepository;
 import org.athletes.traineatrepeat.repository.UserRepository;
 import org.athletes.traineatrepeat.repository.dto.TrainingDTO;
+import org.athletes.traineatrepeat.util.TimeProvider;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class TrainingService {
   private final TrainingRecordConverter trainingRecordConverter;
   private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
+  private final TimeProvider timeProvider;
 
   public TrainingRecordResponse submitTraining(String uuid, TrainingRecordRequest request) {
     var user =
@@ -102,7 +104,8 @@ public class TrainingService {
 
     int daysInPeriod = 1;
     if (period != null) {
-      LocalDate today = LocalDate.now();
+      LocalDate today = timeProvider.getCurrentDate();
+
       switch (period) {
         case WEEK -> {
           var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
