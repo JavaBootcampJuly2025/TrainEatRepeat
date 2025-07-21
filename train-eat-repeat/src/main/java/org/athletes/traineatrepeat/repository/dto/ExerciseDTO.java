@@ -10,9 +10,10 @@ import lombok.*;
 @Builder
 @Table(name = "EXERCISES")
 public class ExerciseDTO {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
-    private String name;
-    private float MET;
+  @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
+  private String id;
+
+  private String name;
+  private float MET;
 }

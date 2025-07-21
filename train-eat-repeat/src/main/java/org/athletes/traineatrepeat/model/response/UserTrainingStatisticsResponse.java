@@ -4,6 +4,4 @@ import lombok.Builder;
 
 @Builder
 public record UserTrainingStatisticsResponse(
-        double avgCaloriesBurnedPerSession,
-        double avgPerDaySessions
-) {}
+    double avgCaloriesBurnedPerSession, double avgPerDaySessions) {}

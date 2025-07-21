@@ -1,15 +1,12 @@
 package org.athletes.traineatrepeat.model.request;
 
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-
 import java.time.LocalDate;
+import lombok.Builder;
 
 @Builder
 public record MealRecordRequest(
-        @NotNull(message = "Food name cannot be null")
-        String foodName,
-        @NotNull(message = "Weight in grams cannot be null")
-        float weightInGrams,
-        LocalDate date
-) {}
+    @NotNull(message = "Food name cannot be null") String foodName,
+    @DecimalMin(value = "0.0", message = "Weight must be a positive number") float weightInGrams,
+    LocalDate date) {}

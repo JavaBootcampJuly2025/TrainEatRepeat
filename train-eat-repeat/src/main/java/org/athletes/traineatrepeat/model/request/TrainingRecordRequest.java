@@ -1,14 +1,9 @@
 package org.athletes.traineatrepeat.model.request;
 
+import java.time.LocalDate;
 import lombok.Builder;
 
-import java.time.LocalDate;
-
 @Builder
-public record TrainingRecordRequest (
-        String uuid,
-        String exercise,
-        float duration,
-        float caloriesLost,
-        LocalDate date
-) {}
+public record TrainingRecordRequest(
+    // TODO: add validation annotations (regex as well)
+    String uuid, String exercise, float duration, float caloriesLost, LocalDate date) {}
