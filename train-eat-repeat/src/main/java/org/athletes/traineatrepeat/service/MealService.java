@@ -31,6 +31,22 @@ public class MealService {
    * the same food multiple times. I would recommend using Caffeine Cache <a
    * href="https://www.baeldung.com/spring-boot-caffeine-cache">https://www.baeldung.com/spring-boot-caffeine-cache</a>
    */
+
+  /**
+   * Calculates the nutritional values (calories, carbs, protein, fat) for a given food and weight.
+   * <p>
+   * This method queries the USDA API to retrieve the nutritional information for the specified
+   * food name. The retrieved nutrient values are scaled based on the provided weight in grams.
+   * Only the first 4 relevant nutrients (calories, carbs, protein, fat) are considered.
+   * <p>
+   * If the food is not found in the USDA API response, the method currently returns an empty map.
+   * (TODO: Consider throwing an exception for better error handling in this case.)
+   *
+   * @param foodName       The name of the food to search in the USDA database.
+   * @param weightInGrams  The weight of the food in grams. The values are scaled based on this weight.
+   *                       If set to 0, the method assumes 100g as the default.
+   * @return A map containing the calculated nutrient values, where keys are {@link Nutrients} and values are scaled floats.
+   */
   private Map<Nutrients, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
     var usdaResponse = usdaClient.searchFood(foodName);
     float factor = calculateFactorByWeight(weightInGrams);
@@ -94,28 +110,62 @@ public class MealService {
     return meals.stream().map(mealRecordConverter::toResponse).toList();
   }
 
+  /**
+   * Calculates the average nutritional intake for a user over a specified time period.
+   *
+   * <p>This method retrieves all meal records for a given user UUID within the specified time period
+   * and computes the average values for protein, fat, carbohydrates, calories, and meal weight in grams.
+   *
+   * <p>If no meals are found for the given user and time period, all averages are returned as zero.
+   *
+   * @param uuid   The unique identifier of the user whose nutrition statistics are to be calculated.
+   * @param period The time period over which the nutritional statistics should be aggregated.
+   * @return A {@link UserNutritionStatisticsResponse} containing the average protein, fat, carbs,
+   *         calories, and meal weight in grams for the user within the given time period.
+   */
   public UserNutritionStatisticsResponse getNutritionStatistics(String uuid, TimePeriod period) {
     var meals = getMealsFromTimePeriod(uuid, period);
 
-    /**
-     * COMMENT: this approach is not memory efficient. Here you are processing List of Meals 4 times
-     * through stream, additionally you are creating duplicate functionality by fallback to a 0 each
-     * time. Try to use for cycle instead
-     */
+    double totalProtein = 0;
+    double totalFat = 0;
+    double totalCarbs = 0;
+    double totalCalories = 0;
+    double totalWeightInGrams = 0;
+    int count = meals.size();
 
-    // TODO: consider using a single pass to calculate all averages
-    double avgProtein = meals.stream().mapToDouble(MealDTO::getProtein).average().orElse(0);
-    double avgFat = meals.stream().mapToDouble(MealDTO::getFat).average().orElse(0);
-    double avgCarbs = meals.stream().mapToDouble(MealDTO::getCarbs).average().orElse(0);
-    double avgCalories = meals.stream().mapToDouble(MealDTO::getCalories).average().orElse(0);
+    for (MealDTO meal : meals) {
+      totalProtein += meal.getProtein();
+      totalFat += meal.getFat();
+      totalCarbs += meal.getCarbs();
+      totalCalories += meal.getCalories();
+      totalWeightInGrams += meal.getWeightInGrams();
+    }
+
+    if (count == 0) {
+      return UserNutritionStatisticsResponse.builder()
+              .avgProtein(0)
+              .avgFat(0)
+              .avgCarbs(0)
+              .avgCalories(0)
+              .avgWeightInGrams(0)
+              .build();
+    }
+
+    double avgProtein = totalProtein / count;
+    double avgFat = totalFat / count;
+    double avgCarbs = totalCarbs / count;
+    double avgCalories = totalCalories / count;
+    double avgWeightInGrams = totalWeightInGrams / count;
 
     return UserNutritionStatisticsResponse.builder()
-        .avgProtein(avgProtein)
-        .avgFat(avgFat)
-        .avgCarbs(avgCarbs)
-        .avgCalories(avgCalories)
-        .build();
+            .avgProtein(avgProtein)
+            .avgFat(avgFat)
+            .avgCarbs(avgCarbs)
+            .avgCalories(avgCalories)
+            .avgWeightInGrams(avgWeightInGrams)
+            .build();
   }
+
 
   private List<MealDTO> getMealsFromTimePeriod(String uuid, TimePeriod timePeriod) {
     if (timePeriod == null) {
