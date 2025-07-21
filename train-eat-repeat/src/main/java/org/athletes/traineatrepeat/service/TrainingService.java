@@ -28,47 +28,47 @@ public class TrainingService {
 
   public TrainingRecordResponse submitTraining(String uuid, TrainingRecordRequest request) {
     var user =
-        userRepository
-            .findById(request.uuid())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            userRepository
+                    .findById(request.uuid())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
     var exercise =
-        exerciseRepository
-            .findByNameIgnoreCase(request.exercise())
-            .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
+            exerciseRepository
+                    .findByNameIgnoreCase(request.exercise())
+                    .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
 
     float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
     var trainingToSave =
-        TrainingDTO.builder()
-            .id(UUID.randomUUID().toString())
-            .uuid(user.getUuid())
-            .exercise(request.exercise())
-            .duration(request.duration())
-            .caloriesLost(calories)
-            .date(request.date())
-            .build();
+            TrainingDTO.builder()
+                    .id(UUID.randomUUID().toString())
+                    .uuid(user.getUuid())
+                    .exercise(request.exercise())
+                    .duration(request.duration())
+                    .caloriesLost(calories)
+                    .date(request.date())
+                    .build();
 
     var savedTraining = trainingRecordRepository.save(trainingToSave);
     return trainingRecordConverter.toResponse(savedTraining);
   }
 
   public TrainingRecordResponse updateTrainingById(
-      String trainingId, TrainingRecordRequest request) {
+          String trainingId, TrainingRecordRequest request) {
     var existingTraining =
-        trainingRecordRepository
-            .findById(trainingId)
-            .orElseThrow(() -> new RuntimeException("Training not found"));
+            trainingRecordRepository
+                    .findById(trainingId)
+                    .orElseThrow(() -> new RuntimeException("Training not found"));
 
     var user =
-        userRepository
-            .findById(request.uuid())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            userRepository
+                    .findById(request.uuid())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
     var exercise =
-        exerciseRepository
-            .findByNameIgnoreCase(request.exercise())
-            .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
+            exerciseRepository
+                    .findByNameIgnoreCase(request.exercise())
+                    .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
 
     float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
@@ -105,20 +105,21 @@ public class TrainingService {
     int daysInPeriod = 1;
     if (period != null) {
       LocalDate today = timeProvider.getCurrentDate();
+
       switch (period) {
         case WEEK -> {
-          LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+          var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
           daysInPeriod = (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfWeek, today) + 1);
         }
         case MONTH -> {
-          LocalDate startOfMonth = today.withDayOfMonth(1);
+          var startOfMonth = today.withDayOfMonth(1);
           daysInPeriod =
                   (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
         }
       }
     }
 
-    double avgSessions = trainings.size() / (double) daysInPeriod;
+    float avgSessions = trainings.size() / (float) daysInPeriod;
 
     return UserTrainingStatisticsResponse.builder()
             .avgCaloriesBurnedPerSession(avgCaloriesBurned)
@@ -142,24 +143,24 @@ public class TrainingService {
   }
 
   private List<TrainingDTO> getTrainingsForToday(String uuid) {
-    LocalDate today = LocalDate.now();
+    var today = LocalDate.now();
     return trainingRecordRepository.findAllByUuidAndDate(uuid, today);
   }
 
   private List<TrainingDTO> getTrainingsForWeek(String uuid) {
-    LocalDate today = LocalDate.now();
-    LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
-    LocalDate endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
+    var today = LocalDate.now();
+    var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+    var endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
 
     return trainingRecordRepository.findTrainingsByUuidAndDateBetween(uuid, startOfWeek, endOfWeek);
   }
 
   private List<TrainingDTO> getTrainingsForMonth(String uuid) {
-    LocalDate today = LocalDate.now();
-    LocalDate startOfMonth = today.withDayOfMonth(1);
-    LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+    var today = LocalDate.now();
+    var startOfMonth = today.withDayOfMonth(1);
+    var endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 
     return trainingRecordRepository.findTrainingsByUuidAndDateBetween(
-        uuid, startOfMonth, endOfMonth);
+            uuid, startOfMonth, endOfMonth);
   }
 }

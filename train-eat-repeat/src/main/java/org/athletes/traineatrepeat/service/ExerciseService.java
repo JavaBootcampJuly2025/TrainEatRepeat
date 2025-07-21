@@ -17,30 +17,29 @@ public class ExerciseService {
   private final ExerciseConverter exerciseConverter;
 
   public ExerciseResponse createExercise(ExerciseRequest request) {
-    ExerciseDTO exerciseToSave =
-        ExerciseDTO.builder().name(request.name()).MET(request.met()).build();
-    ExerciseDTO savedExercise = exerciseRepository.save(exerciseToSave);
+    var exerciseToSave = ExerciseDTO.builder().name(request.name()).MET(request.met()).build();
+    var savedExercise = exerciseRepository.save(exerciseToSave);
     return exerciseConverter.toResponseFromEntity(savedExercise);
   }
 
   public List<ExerciseResponse> getAllExercises() {
-    List<ExerciseDTO> exercises = exerciseRepository.findAll();
+    var exercises = exerciseRepository.findAll();
     return exercises.stream().map(exerciseConverter::toResponseFromEntity).toList();
   }
 
   public ExerciseDTO getExerciseById(String id) {
     return exerciseRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
   }
 
   public ExerciseResponse updateExercise(String id, ExerciseRequest request) {
-    ExerciseDTO existingExercise = getExerciseById(id);
+    var existingExercise = getExerciseById(id);
 
     existingExercise.setName(request.name());
     existingExercise.setMET(request.met());
 
-    ExerciseDTO updatedExercise = exerciseRepository.save(existingExercise);
+    var updatedExercise = exerciseRepository.save(existingExercise);
     return exerciseConverter.toResponseFromEntity(updatedExercise);
   }
 
