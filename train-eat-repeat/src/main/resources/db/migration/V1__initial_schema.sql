@@ -1,7 +1,8 @@
 CREATE TABLE USERS
 (
-    uuid     Varchar(36) PRIMARY KEY,
+    uuid     VARCHAR(36) PRIMARY KEY,
     username VARCHAR(255),
+    email    VARCHAR(255),
     password VARCHAR(255),
     age      INT,
     gender   VARCHAR(255),
@@ -21,7 +22,7 @@ CREATE TABLE MEALRECORDS
     carbs            FLOAT,
     protein          FLOAT,
     fat              FLOAT,
-    weight_in_grams  FLOAT      NOT NULL DEFAULT 100.0,
+    weight_in_grams  FLOAT NOT NULL DEFAULT 100.0,
     date             DATE,
     CONSTRAINT fk_user FOREIGN KEY (uuid) REFERENCES USERS (uuid) ON DELETE CASCADE
 );
@@ -34,7 +35,7 @@ CREATE TABLE TRAININGRECORDS
     duration      FLOAT,
     calories_lost FLOAT,
     date          DATE,
-    CONSTRAINT fk_training_user FOREIGN KEY (uuid) REFERENCES users (uuid) ON DELETE CASCADE
+    CONSTRAINT fk_training_user FOREIGN KEY (uuid) REFERENCES USERS (uuid) ON DELETE CASCADE
 );
 
 CREATE TABLE EXERCISES
