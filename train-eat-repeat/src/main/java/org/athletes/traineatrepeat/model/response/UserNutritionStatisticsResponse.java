@@ -7,5 +7,6 @@ public record UserNutritionStatisticsResponse (
     double avgProtein,
     double avgFat,
     double avgCarbs,
-    double avgCalories
+    double avgCalories,
+    double avgWeightInGrams
 ) {}
