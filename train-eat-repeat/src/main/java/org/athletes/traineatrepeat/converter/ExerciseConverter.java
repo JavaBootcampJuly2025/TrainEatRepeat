@@ -8,18 +8,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class ExerciseConverter {
 
-    public ExerciseDTO fromRequestToEntity(ExerciseRequest request) {
-        return ExerciseDTO.builder()
-                .name(request.name())
-                .MET(request.MET())
-                .build();
-    }
+  public ExerciseDTO fromRequestToEntity(ExerciseRequest request) {
+    return ExerciseDTO.builder().name(request.name()).MET(request.met()).build();
+  }
 
-    public ExerciseResponse toResponseFromEntity(ExerciseDTO entity) {
-        return ExerciseResponse.builder()
-                .id(entity.getId())
-                .name(entity.getName())
-                .MET(entity.getMET())
-                .build();
-    }
+  public ExerciseResponse toResponseFromEntity(ExerciseDTO entity) {
+    return ExerciseResponse.builder()
+        .id(entity.getId())
+        .name(entity.getName())
+        .met(entity.getMET())
+        .build();
+  }
 }

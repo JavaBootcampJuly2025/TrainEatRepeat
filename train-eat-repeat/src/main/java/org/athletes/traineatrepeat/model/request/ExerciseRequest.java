@@ -1,13 +1,15 @@
 package org.athletes.traineatrepeat.model.request;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 @Builder
 public record ExerciseRequest(
+    @NotNull
+        // TODO: add regex here to validate the name
+        // @Pattern()
         String name,
-        /**
-         * COMMENT: Java variable names should be in camelCase. If you want to break the rule,
-         * use the @JsonProperty annotation to specify the JSON field name
-         */
-        float MET
-) {}
+    @JsonProperty("MET") @DecimalMin(value = "0.0", message = "MET must be a positive number")
+        float met) {}
