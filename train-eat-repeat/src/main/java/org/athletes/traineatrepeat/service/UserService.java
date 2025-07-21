@@ -25,6 +25,10 @@ public class UserService {
         var user = useRepository.getUserByUuid(uuid);
         return userConverter.convertToUserDTO(user);
     }
+
+    /**
+     * COMMENT: You can use just .toList() instead of .collect(Collectors.toList()) in Java 21
+     */
     public List<UserResponse> getAllUsers() {
         var users = useRepository.findAll();
         return users.stream()

@@ -17,6 +17,10 @@ public class UserController {
 
     private final UserService userService;
 
+    /**
+     * COMMENT: I would say, that it is more feasible to use common Authentication header with Bearer authentication scheme, rather than introduce custom JWT token header.
+     * <a href="https://stackoverflow.com/questions/33265812/best-http-authorization-header-type-for-jwt">https://stackoverflow.com/questions/33265812/best-http-authorization-header-type-for-jwt</a>
+     */
     @GetMapping("/user-data")
     public UserResponse getUserData(@RequestParam String uuid, @RequestHeader (value = "jwtToken", required = false) String jwtToken) {
         return userService.getUser(uuid, jwtToken);
@@ -26,6 +30,10 @@ public class UserController {
         return userService.getAllUsers();
     }
 
+    /**
+     * COMMENT: This controller method is not needed. If you need to implement endpoint for testing the connection,
+     * you can consider implementing Spring Boot Health Indicator or Actuator endpoint. <a href="https://www.baeldung.com/spring-boot-health-indicators">https://www.baeldung.com/spring-boot-health-indicators</a>
+     */
     @GetMapping("/test")
     public String test() {
         return "UserController is working";

@@ -10,6 +10,7 @@ import org.athletes.traineatrepeat.api.UsdaClient;
 import org.athletes.traineatrepeat.repository.MealRecordRepository;
 import org.athletes.traineatrepeat.repository.dto.MealDTO;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -25,6 +26,10 @@ public class MealService {
     private final MealRecordConverter mealRecordConverter;
     private final UsdaClient usdaClient;
 
+    /**
+     * COMMENT: you can actually introduce caching mechanism here to avoid calling third-party API for the same food multiple times.
+     * I would recommend using Caffeine Cache <a href="https://www.baeldung.com/spring-boot-caffeine-cache">https://www.baeldung.com/spring-boot-caffeine-cache</a>
+     */
     private Map<String, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
         var usdaResponse = usdaClient.searchFood(foodName);
 
@@ -33,9 +38,20 @@ public class MealService {
         float protein = 0.0f;
         float fat = 0.0f;
 
+        /**
+         * COMMENT: NIT. in Spring Boot there is a method CollectionUtils.isEmpty(...) which allow to check if collection is null or empty. Also consider adding either
+         * Exception or error log if the food is not found in the USDA database.
+         */
         if (usdaResponse != null && usdaResponse.getFoods() != null && !usdaResponse.getFoods().isEmpty()) {
+            /**
+             * COMMENT: you can use .getFirst() method for the collection in Java 21
+             */
             var food = usdaResponse.getFoods().get(0);
             for (var nutrient : food.getFoodNutrients()) {
+                /**
+                 * COMMENT: These switch-case values can be replaced with functional processing through ENUM. You can introduce these Strings as ENUM values
+                 * for CALORIES, PROTEIN, FAT, CARBS and use them during for cycle
+                 */
                 switch (nutrient.getNutrientName()) {
                     case "Energy" -> calories = nutrient.getValue();
                     case "Protein" -> protein = nutrient.getValue();
@@ -45,9 +61,16 @@ public class MealService {
             }
         }
 
+        /**
+         * COMMENT: This should be extracted into the separate method, for example {@code calculateFactorByWeight}
+         */
         float actualWeight = weightInGrams == 0 ? 100.0f : weightInGrams;
         float factor = actualWeight / 100.0f;
 
+        /**
+         * COMMENT: NIT. You should avoid using primitives wrapper classes as map parameters, because with these types, unexpected values can be put into the map.
+         * Map Keys should be either enum or model class.
+         */
         Map<String, Float> nutrition = new HashMap<>();
         nutrition.put("calories", calories * factor);
         nutrition.put("carbs", carbs * factor);
@@ -92,6 +115,11 @@ public class MealService {
 
     public UserNutritionStatisticsResponse getNutritionStatistics(String uuid, TimePeriod period) {
         var meals = getMealsFromTimePeriod(uuid, period);
+
+        /**
+         * COMMENT: this approach is not memory efficient. Here you are processing List of Meals 4 times through stream,
+         * additionally you are creating duplicate functionality by fallback to a 0 each time. Try to use for cycle instead
+         */
         double avgProtein = meals.stream().mapToDouble(MealDTO::getProtein).average().orElse(0);
         double avgFat = meals.stream().mapToDouble(MealDTO::getFat).average().orElse(0);
         double avgCarbs = meals.stream().mapToDouble(MealDTO::getCarbs).average().orElse(0);

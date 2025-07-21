@@ -29,6 +29,10 @@ public class ExerciseController {
         return ResponseEntity.ok(responses);
     }
 
+    /**
+     * COMMENT: Usually, for POST and PUT methods, endpoints are supported with annotation {@code @Produces(MediaType.APPLICATION_JSON)}. If these methods are expected to handle Request Body,
+     * endpoints are also supported with {@code @Consumes(MediaType.APPLICATION_JSON)} to specify JSON as media type.
+     */
     @PutMapping("/{id}") // Path variable remains {id} as per standard REST conventions
     public ResponseEntity<ExerciseResponse> updateExercise(@PathVariable String id, @RequestBody ExerciseRequest request) {
         ExerciseResponse response = exerciseService.updateExercise(id, request);

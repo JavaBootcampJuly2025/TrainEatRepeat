@@ -43,6 +43,10 @@ public class TrainingService {
         return trainingRecordConverter.toResponse(savedTraining);
     }
 
+    /**
+     * COMMENT: NIT. In the project it is a good approach to maintain consistency in the assigning types to a variables.
+     * Here you are using `var` for the existingTraining, but then you use explicit type. You should agree on a convention and stick to it.
+     */
     public TrainingRecordResponse updateTrainingById(String trainingId, TrainingRecordRequest request) {
         var existingTraining = trainingRecordRepository.findById(trainingId)
                 .orElseThrow(() -> new RuntimeException("Training not found"));
@@ -88,6 +92,9 @@ public class TrainingService {
 
         int daysInPeriod = 1;
         if (period != null) {
+            /**
+             * COMMENT: You can introduce TimeProvider class as a component and retrieve current date from it. This will also simplify unit test creation, as you will be able to just mock the date
+             */
             LocalDate today = LocalDate.now();
             switch (period) {
                 case WEEK -> {

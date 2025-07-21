@@ -27,6 +27,9 @@ public class ExerciseService {
         return exerciseConverter.toResponseFromEntity(savedExercise);
     }
 
+    /**
+     * COMMENT: You can use just .toList() instead of .collect(Collectors.toList()) in Java 21
+     */
     public List<ExerciseResponse> getAllExercises() {
         List<ExerciseDTO> exercises = exerciseRepository.findAll();
         return exercises.stream()
@@ -34,6 +37,10 @@ public class ExerciseService {
                 .collect(Collectors.toList());
     }
 
+    /** COMMENT: I see you have implemented a method to get an exercise by ID. Yet, you are still retrieving exercises by id and handle exception multiple times.
+    * This function is not used, even-though it is very useful. Use it instead of calling exerciseRepository.findById(id)
+    * .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id)); multiple times
+    */
     public ExerciseResponse getExerciseById(String id) {
         return exerciseRepository.findById(id)
                 .map(exerciseConverter::toResponseFromEntity)
@@ -42,6 +49,11 @@ public class ExerciseService {
 
     public ExerciseResponse updateExercise(String id, ExerciseRequest request) {
         ExerciseDTO existingExercise = exerciseRepository.findById(id)
+                /**
+                * COMMENT: I see that you are using RuntimeException everywhere. Instead, you can use custom exceptions
+                * in which you can also define HTTP error codes. Example : TrainEatRepeatException class. You can also go a step further and
+                * create custom Error Handling for HTTP errors.
+                */
                 .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
 
         existingExercise.setName(request.name());
