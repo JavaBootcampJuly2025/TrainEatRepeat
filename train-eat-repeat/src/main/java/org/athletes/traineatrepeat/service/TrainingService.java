@@ -26,49 +26,49 @@ public class TrainingService {
 
   public TrainingRecordResponse submitTraining(String uuid, TrainingRecordRequest request) {
     var user =
-        userRepository
-            .findById(request.uuid())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            userRepository
+                    .findById(request.uuid())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
     var exercise =
-        exerciseRepository
-            .findByNameIgnoreCase(request.exercise())
-            .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
+            exerciseRepository
+                    .findByNameIgnoreCase(request.exercise())
+                    .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
 
-    float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+    var calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
     var trainingToSave =
-        TrainingDTO.builder()
-            .id(UUID.randomUUID().toString())
-            .uuid(user.getUuid())
-            .exercise(request.exercise())
-            .duration(request.duration())
-            .caloriesLost(calories)
-            .date(request.date())
-            .build();
+            TrainingDTO.builder()
+                    .id(UUID.randomUUID().toString())
+                    .uuid(user.getUuid())
+                    .exercise(request.exercise())
+                    .duration(request.duration())
+                    .caloriesLost(calories)
+                    .date(request.date())
+                    .build();
 
     var savedTraining = trainingRecordRepository.save(trainingToSave);
     return trainingRecordConverter.toResponse(savedTraining);
   }
 
   public TrainingRecordResponse updateTrainingById(
-      String trainingId, TrainingRecordRequest request) {
+          String trainingId, TrainingRecordRequest request) {
     var existingTraining =
-        trainingRecordRepository
-            .findById(trainingId)
-            .orElseThrow(() -> new RuntimeException("Training not found"));
+            trainingRecordRepository
+                    .findById(trainingId)
+                    .orElseThrow(() -> new RuntimeException("Training not found"));
 
     var user =
-        userRepository
-            .findById(request.uuid())
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            userRepository
+                    .findById(request.uuid())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
 
     var exercise =
-        exerciseRepository
-            .findByNameIgnoreCase(request.exercise())
-            .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
+            exerciseRepository
+                    .findByNameIgnoreCase(request.exercise())
+                    .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
 
-    float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+    var calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
     existingTraining.setExercise(request.exercise());
     existingTraining.setDuration(request.duration());
@@ -97,38 +97,31 @@ public class TrainingService {
 
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
     var trainings = getTrainingsFromTimePeriod(uuid, period);
-    double avgCaloriesBurned =
-        trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
+    var avgCaloriesBurned =
+            trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
 
-    int daysInPeriod = 1;
+    var daysInPeriod = 1;
     if (period != null) {
-
-      // private final TimeProvider timeProvider; // Uncomment if you introduce TimeProvider as a
-      // component
-      /**
-       * COMMENT: You can introduce TimeProvider class as a component and retrieve current date from
-       * it. This will also simplify unit test creation, as you will be able to just mock the date
-       */
       LocalDate today = LocalDate.now();
       switch (period) {
         case WEEK -> {
-          LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+          var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
           daysInPeriod = (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfWeek, today) + 1);
         }
         case MONTH -> {
-          LocalDate startOfMonth = today.withDayOfMonth(1);
+          var startOfMonth = today.withDayOfMonth(1);
           daysInPeriod =
-              (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
+                  (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
         }
       }
     }
 
-    double avgSessions = trainings.size() / (double) daysInPeriod;
+    var avgSessions = trainings.size() / (double) daysInPeriod;
 
     return UserTrainingStatisticsResponse.builder()
-        .avgCaloriesBurnedPerSession(avgCaloriesBurned)
-        .avgPerDaySessions(avgSessions)
-        .build();
+            .avgCaloriesBurnedPerSession(avgCaloriesBurned)
+            .avgPerDaySessions(avgSessions)
+            .build();
   }
 
   private List<TrainingDTO> getTrainingsFromTimePeriod(String uuid, TimePeriod timePeriod) {
@@ -147,24 +140,24 @@ public class TrainingService {
   }
 
   private List<TrainingDTO> getTrainingsForToday(String uuid) {
-    LocalDate today = LocalDate.now();
+    var today = LocalDate.now();
     return trainingRecordRepository.findAllByUuidAndDate(uuid, today);
   }
 
   private List<TrainingDTO> getTrainingsForWeek(String uuid) {
-    LocalDate today = LocalDate.now();
-    LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
-    LocalDate endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
+    var today = LocalDate.now();
+    var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+    var endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
 
     return trainingRecordRepository.findTrainingsByUuidAndDateBetween(uuid, startOfWeek, endOfWeek);
   }
 
   private List<TrainingDTO> getTrainingsForMonth(String uuid) {
-    LocalDate today = LocalDate.now();
-    LocalDate startOfMonth = today.withDayOfMonth(1);
-    LocalDate endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
+    var today = LocalDate.now();
+    var startOfMonth = today.withDayOfMonth(1);
+    var endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 
     return trainingRecordRepository.findTrainingsByUuidAndDateBetween(
-        uuid, startOfMonth, endOfMonth);
+            uuid, startOfMonth, endOfMonth);
   }
 }
