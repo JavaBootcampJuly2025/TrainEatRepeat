@@ -35,7 +35,7 @@ public class TrainingService {
                     .findByNameIgnoreCase(request.exercise())
                     .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
 
-    var calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+    float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
     var trainingToSave =
             TrainingDTO.builder()
@@ -68,7 +68,7 @@ public class TrainingService {
                     .findByNameIgnoreCase(request.exercise())
                     .orElseThrow(() -> new RuntimeException("Exercise not found: " + request.exercise()));
 
-    var calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+    float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
     existingTraining.setExercise(request.exercise());
     existingTraining.setDuration(request.duration());
@@ -97,10 +97,10 @@ public class TrainingService {
 
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
     var trainings = getTrainingsFromTimePeriod(uuid, period);
-    var avgCaloriesBurned =
+    double avgCaloriesBurned =
             trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
 
-    var daysInPeriod = 1;
+    int daysInPeriod = 1;
     if (period != null) {
       LocalDate today = LocalDate.now();
       switch (period) {
@@ -116,7 +116,7 @@ public class TrainingService {
       }
     }
 
-    var avgSessions = trainings.size() / (double) daysInPeriod;
+    float avgSessions = trainings.size() / (float) daysInPeriod;
 
     return UserTrainingStatisticsResponse.builder()
             .avgCaloriesBurnedPerSession(avgCaloriesBurned)

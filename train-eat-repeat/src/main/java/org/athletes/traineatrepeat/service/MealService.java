@@ -28,7 +28,7 @@ public class MealService {
 
   private Map<Nutrients, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
     var usdaResponse = usdaClient.searchFood(foodName);
-    var factor = calculateFactorByWeight(weightInGrams);
+    float factor = calculateFactorByWeight(weightInGrams);
     var nutritionMap = new HashMap<Nutrients, Float>();
 
     if (!CollectionUtils.isEmpty(usdaResponse.foods())) {
@@ -89,7 +89,7 @@ public class MealService {
     double totalCarbs = 0;
     double totalCalories = 0;
     double totalWeightInGrams = 0;
-    var count = meals.size();
+    int count = meals.size();
 
     for (var meal : meals) {
       totalProtein += meal.getProtein();
@@ -109,11 +109,11 @@ public class MealService {
               .build();
     }
 
-    var avgProtein = totalProtein / count;
-    var avgFat = totalFat / count;
-    var avgCarbs = totalCarbs / count;
-    var avgCalories = totalCalories / count;
-    var avgWeightInGrams = totalWeightInGrams / count;
+    double avgProtein = totalProtein / count;
+    double avgFat = totalFat / count;
+    double avgCarbs = totalCarbs / count;
+    double avgCalories = totalCalories / count;
+    double avgWeightInGrams = totalWeightInGrams / count;
 
     return UserNutritionStatisticsResponse.builder()
             .avgProtein(avgProtein)
