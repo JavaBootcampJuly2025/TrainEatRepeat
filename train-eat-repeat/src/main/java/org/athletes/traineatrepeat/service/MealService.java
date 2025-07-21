@@ -8,6 +8,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.api.UsdaClient;
 import org.athletes.traineatrepeat.converter.MealRecordConverter;
+import org.athletes.traineatrepeat.exceptions.TrainEatRepeatException;
 import org.athletes.traineatrepeat.model.Nutrients;
 import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.request.MealRecordRequest;
@@ -28,6 +29,10 @@ public class MealService {
 
   private Map<Nutrients, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
     var usdaResponse = usdaClient.searchFood(foodName);
+    if (CollectionUtils.isEmpty(usdaResponse.foods())) {
+      throw new TrainEatRepeatException("Food not found: " + foodName);
+    }
+
     float factor = calculateFactorByWeight(weightInGrams);
     var nutritionMap = new HashMap<Nutrients, Float>();
 
@@ -36,17 +41,18 @@ public class MealService {
       for (var usdaFoodNutrient : food.foodNutrients()) {
 
         if (nutritionMap.size() == 4) {
-          break; // Limit to 4 nutrients (calories, carbs, protein, fat)
+          break;
         }
 
         var nutrient = Nutrients.fromUsdaName(usdaFoodNutrient.nutrientName());
-
-        if (nutrient == null) {
-          continue; // Skip nutrients that are not recognized
+        if (nutrient != null) {
+          nutritionMap.put(nutrient, usdaFoodNutrient.value() * factor);
         }
-
-        nutritionMap.put(nutrient, usdaFoodNutrient.value() * factor);
       }
+    }
+
+    if (nutritionMap.isEmpty()) {
+      throw new TrainEatRepeatException("No nutritional information found for: " + foodName);
     }
 
     return nutritionMap;
@@ -57,20 +63,23 @@ public class MealService {
   }
 
   public MealRecordResponse submitMeal(String uuid, MealRecordRequest request) {
+    if (request.foodName() == null || request.foodName().isBlank()) {
+      throw new TrainEatRepeatException("Food name cannot be null or empty");
+    }
     var nutrition = calculateNutritionalValues(request.foodName(), request.weightInGrams());
 
     var mealToSave =
-        MealDTO.builder()
-            .id(UUID.randomUUID().toString())
-            .uuid(uuid)
-            .foodName(request.foodName())
-            .calories(nutrition.get(Nutrients.CALORIES))
-            .carbs(nutrition.get(Nutrients.CARBS))
-            .protein(nutrition.get(Nutrients.PROTEIN))
-            .fat(nutrition.get(Nutrients.FAT))
-            .weightInGrams(request.weightInGrams())
-            .date(request.date() != null ? request.date() : LocalDate.now())
-            .build();
+            MealDTO.builder()
+                    .id(UUID.randomUUID().toString())
+                    .uuid(uuid)
+                    .foodName(request.foodName())
+                    .calories(nutrition.get(Nutrients.CALORIES))
+                    .carbs(nutrition.get(Nutrients.CARBS))
+                    .protein(nutrition.get(Nutrients.PROTEIN))
+                    .fat(nutrition.get(Nutrients.FAT))
+                    .weightInGrams(request.weightInGrams())
+                    .date(request.date() != null ? request.date() : LocalDate.now())
+                    .build();
 
     var savedMeal = mealRecordRepository.save(mealToSave);
     return mealRecordConverter.toResponse(savedMeal);
@@ -78,6 +87,9 @@ public class MealService {
 
   public List<MealRecordResponse> getMealsForUser(String uuid, TimePeriod timePeriod) {
     var meals = getMealsFromTimePeriod(uuid, timePeriod);
+    if (meals.isEmpty()) {
+      throw new TrainEatRepeatException("No meals found for user: " + uuid);
+    }
     return meals.stream().map(mealRecordConverter::toResponse).toList();
   }
 
@@ -101,12 +113,12 @@ public class MealService {
 
     if (count == 0) {
       return UserNutritionStatisticsResponse.builder()
-          .avgProtein(0)
-          .avgFat(0)
-          .avgCarbs(0)
-          .avgCalories(0)
-          .avgWeightInGrams(0)
-          .build();
+              .avgProtein(0)
+              .avgFat(0)
+              .avgCarbs(0)
+              .avgCalories(0)
+              .avgWeightInGrams(0)
+              .build();
     }
 
     double avgProtein = totalProtein / count;
@@ -116,12 +128,12 @@ public class MealService {
     double avgWeightInGrams = totalWeightInGrams / count;
 
     return UserNutritionStatisticsResponse.builder()
-        .avgProtein(avgProtein)
-        .avgFat(avgFat)
-        .avgCarbs(avgCarbs)
-        .avgCalories(avgCalories)
-        .avgWeightInGrams(avgWeightInGrams)
-        .build();
+            .avgProtein(avgProtein)
+            .avgFat(avgFat)
+            .avgCarbs(avgCarbs)
+            .avgCalories(avgCalories)
+            .avgWeightInGrams(avgWeightInGrams)
+            .build();
   }
 
   private List<MealDTO> getMealsFromTimePeriod(String uuid, TimePeriod timePeriod) {
@@ -136,14 +148,17 @@ public class MealService {
   }
 
   public void deleteMealById(String mealId) {
+    if (!mealRecordRepository.existsById(mealId)) {
+      throw new TrainEatRepeatException("Meal not found with ID: " + mealId);
+    }
     mealRecordRepository.deleteById(mealId);
   }
 
   public MealRecordResponse updateMeal(String mealId, MealRecordRequest request) {
     var existingMeal =
-        mealRecordRepository
-            .findById(mealId)
-            .orElseThrow(() -> new RuntimeException("Meal not found with ID: " + mealId));
+            mealRecordRepository
+                    .findById(mealId)
+                    .orElseThrow(() ->  new TrainEatRepeatException("Meal not found with ID: " + mealId));
 
     existingMeal.setFoodName(request.foodName());
     existingMeal.setDate(request.date() != null ? request.date() : LocalDate.now());

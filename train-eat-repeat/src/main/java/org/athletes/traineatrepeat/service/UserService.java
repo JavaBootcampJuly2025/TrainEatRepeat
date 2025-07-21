@@ -3,6 +3,7 @@ package org.athletes.traineatrepeat.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.converter.UserConverter;
+import org.athletes.traineatrepeat.exceptions.TrainEatRepeatException;
 import org.athletes.traineatrepeat.model.TimePeriod;
 import org.athletes.traineatrepeat.model.response.UserNutritionStatisticsResponse;
 import org.athletes.traineatrepeat.model.response.UserResponse;
@@ -24,20 +25,43 @@ public class UserService implements UserDetailsService {
   private final TrainingService trainingService;
 
   public UserResponse getUser(String uuid) {
+    if (uuid == null || uuid.isBlank()) {
+      throw new TrainEatRepeatException("User UUID cannot be null or empty");
+    }
     var user = useRepository.getUserByUuid(uuid);
+    if (user == null) {
+      throw new TrainEatRepeatException("User not found with UUID: " + uuid);
+    }
     return userConverter.convertToUserDTO(user);
   }
 
   public List<UserResponse> getAllUsers() {
     var users = useRepository.findAll();
+    if (users.isEmpty()) {
+      throw new TrainEatRepeatException("No users found");
+    }
     return users.stream().map(userConverter::convertToUserDTO).toList();
   }
 
   public UserNutritionStatisticsResponse getNutritionStatistics(String uuid, TimePeriod period) {
+    if (uuid == null || uuid.isBlank()) {
+      throw new TrainEatRepeatException("User UUID cannot be null or empty");
+    }
+
+    if (!useRepository.existsById(uuid)) {
+      throw new TrainEatRepeatException("User not found with UUID: " + uuid);
+    }
     return mealService.getNutritionStatistics(uuid, period);
   }
 
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
+    if (uuid == null || uuid.isBlank()) {
+      throw new TrainEatRepeatException("User UUID cannot be null or empty");
+    }
+
+    if (!useRepository.existsById(uuid)) {
+      throw new TrainEatRepeatException("User not found with UUID: " + uuid);
+    }
     return trainingService.getTrainingStatistics(uuid, period);
   }
 
