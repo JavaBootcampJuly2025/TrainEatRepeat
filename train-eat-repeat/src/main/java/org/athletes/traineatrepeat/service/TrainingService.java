@@ -13,6 +13,7 @@ import org.athletes.traineatrepeat.repository.ExerciseRepository;
 import org.athletes.traineatrepeat.repository.TrainingRecordRepository;
 import org.athletes.traineatrepeat.repository.UserRepository;
 import org.athletes.traineatrepeat.repository.dto.TrainingDTO;
+import org.athletes.traineatrepeat.util.TimeProvider;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class TrainingService {
   private final TrainingRecordConverter trainingRecordConverter;
   private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
+  private final TimeProvider timeProvider;
 
   public TrainingRecordResponse submitTraining(String uuid, TrainingRecordRequest request) {
     var user =
@@ -98,18 +100,11 @@ public class TrainingService {
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
     var trainings = getTrainingsFromTimePeriod(uuid, period);
     double avgCaloriesBurned =
-        trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
+            trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
 
     int daysInPeriod = 1;
     if (period != null) {
-
-      // private final TimeProvider timeProvider; // Uncomment if you introduce TimeProvider as a
-      // component
-      /**
-       * COMMENT: You can introduce TimeProvider class as a component and retrieve current date from
-       * it. This will also simplify unit test creation, as you will be able to just mock the date
-       */
-      LocalDate today = LocalDate.now();
+      LocalDate today = timeProvider.getCurrentDate();
       switch (period) {
         case WEEK -> {
           LocalDate startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
@@ -118,7 +113,7 @@ public class TrainingService {
         case MONTH -> {
           LocalDate startOfMonth = today.withDayOfMonth(1);
           daysInPeriod =
-              (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
+                  (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
         }
       }
     }
@@ -126,9 +121,9 @@ public class TrainingService {
     double avgSessions = trainings.size() / (double) daysInPeriod;
 
     return UserTrainingStatisticsResponse.builder()
-        .avgCaloriesBurnedPerSession(avgCaloriesBurned)
-        .avgPerDaySessions(avgSessions)
-        .build();
+            .avgCaloriesBurnedPerSession(avgCaloriesBurned)
+            .avgPerDaySessions(avgSessions)
+            .build();
   }
 
   private List<TrainingDTO> getTrainingsFromTimePeriod(String uuid, TimePeriod timePeriod) {
