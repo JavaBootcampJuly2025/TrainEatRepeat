@@ -15,9 +15,9 @@ public class AppConfig {
   @Primary
   public ObjectMapper objectMapper() {
     return new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
-            .setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        .registerModule(new JavaTimeModule())
+        .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        .configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
+        .setSerializationInclusion(JsonInclude.Include.NON_NULL);
   }
 }

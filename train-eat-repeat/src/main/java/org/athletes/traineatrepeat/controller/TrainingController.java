@@ -1,5 +1,6 @@
 package org.athletes.traineatrepeat.controller;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.TimePeriod;
@@ -17,8 +18,8 @@ public class TrainingController {
 
   @PostMapping("/submit-training")
   public TrainingRecordResponse submitTraining(
-      @RequestParam String uuid, @RequestBody TrainingRecordRequest request) {
-    return trainingService.submitTraining(request);
+      @RequestParam String uuid, @Valid @RequestBody TrainingRecordRequest request) {
+    return trainingService.submitTraining(uuid, request);
   }
 
   @GetMapping("/trainings")
@@ -34,7 +35,7 @@ public class TrainingController {
 
   @PutMapping("/{id}")
   public TrainingRecordResponse updateTraining(
-      @PathVariable String id, @RequestBody TrainingRecordRequest request) {
+      @PathVariable String id, @Valid @RequestBody TrainingRecordRequest request) {
     return trainingService.updateTrainingById(id, request);
   }
 }
