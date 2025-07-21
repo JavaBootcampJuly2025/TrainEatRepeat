@@ -24,7 +24,7 @@ public class TrainingService {
   private final ExerciseRepository exerciseRepository;
   private final UserRepository userRepository;
 
-  public TrainingRecordResponse submitTraining(TrainingRecordRequest request) {
+  public TrainingRecordResponse submitTraining(String uuid, TrainingRecordRequest request) {
     var user =
         userRepository
             .findById(request.uuid())
@@ -37,10 +37,15 @@ public class TrainingService {
 
     float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
 
-    var trainingToSave = trainingRecordConverter.fromRequest(request);
-    trainingToSave.setId(UUID.randomUUID().toString());
-    trainingToSave.setUuid(user.getUuid());
-    trainingToSave.setCaloriesLost(calories);
+    var trainingToSave =
+        TrainingDTO.builder()
+            .id(UUID.randomUUID().toString())
+            .uuid(user.getUuid())
+            .exercise(request.exercise())
+            .duration(request.duration())
+            .caloriesLost(calories)
+            .date(request.date())
+            .build();
 
     var savedTraining = trainingRecordRepository.save(trainingToSave);
     return trainingRecordConverter.toResponse(savedTraining);
