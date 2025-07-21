@@ -19,13 +19,13 @@ public class ExerciseController {
 
   @PostMapping("/submit-exercise")
   public ResponseEntity<ExerciseResponse> createExercise(@RequestBody ExerciseRequest request) {
-    ExerciseResponse response = exerciseService.createExercise(request);
+    var response = exerciseService.createExercise(request);
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
   @GetMapping
   public ResponseEntity<List<ExerciseResponse>> getAllExercises() {
-    List<ExerciseResponse> responses = exerciseService.getAllExercises();
+    var responses = exerciseService.getAllExercises();
     return ResponseEntity.ok(responses);
   }
 
@@ -36,12 +36,12 @@ public class ExerciseController {
    * specify JSON as media type.
    */
   @PutMapping(
-      value = "/{id}",
-      produces = MediaType.APPLICATION_JSON_VALUE,
-      consumes = MediaType.APPLICATION_JSON_VALUE)
+          value = "/{id}",
+          produces = MediaType.APPLICATION_JSON_VALUE,
+          consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ExerciseResponse> updateExercise(
-      @PathVariable String id, @RequestBody ExerciseRequest request) {
-    ExerciseResponse response = exerciseService.updateExercise(id, request);
+          @PathVariable String id, @RequestBody ExerciseRequest request) {
+    var response = exerciseService.updateExercise(id, request);
     return ResponseEntity.ok(response);
   }
 
