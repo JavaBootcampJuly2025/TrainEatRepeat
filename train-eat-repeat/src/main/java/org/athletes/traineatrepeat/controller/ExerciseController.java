@@ -1,5 +1,9 @@
 package org.athletes.traineatrepeat.controller;
 
+import static org.athletes.traineatrepeat.common.ValidationCommon.UUID_REGEX;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.request.ExerciseRequest;
@@ -8,8 +12,10 @@ import org.athletes.traineatrepeat.service.ExerciseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequestMapping("/exercises")
 @RequiredArgsConstructor
@@ -40,13 +46,17 @@ public class ExerciseController {
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ExerciseResponse> updateExercise(
-      @PathVariable String id, @RequestBody ExerciseRequest request) {
+      @PathVariable @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+          String id,
+      @RequestBody ExerciseRequest request) {
     var response = exerciseService.updateExercise(id, request);
     return ResponseEntity.ok(response);
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteExercise(@PathVariable String id) {
+  public ResponseEntity<Void> deleteExercise(
+      @PathVariable @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+          String id) {
     exerciseService.deleteExercise(id);
     return ResponseEntity.noContent().build();
   }

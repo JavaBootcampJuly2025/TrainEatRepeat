@@ -19,7 +19,8 @@ public class ExerciseService {
 
   public ExerciseResponse createExercise(ExerciseRequest request) {
     if (exerciseRepository.findByNameIgnoreCase(request.name()).isPresent()) {
-      throw new TrainEatRepeatException("Exercise with name '" + request.name() + "' already exists");
+      throw new TrainEatRepeatException(
+          "Exercise with name '" + request.name() + "' already exists");
     }
 
     var exerciseToSave = ExerciseDTO.builder().name(request.name()).MET(request.met()).build();
@@ -37,8 +38,8 @@ public class ExerciseService {
 
   private ExerciseDTO getExerciseEntityById(String id) {
     return exerciseRepository
-            .findById(id)
-            .orElseThrow(() -> new TrainEatRepeatException("Exercise not found with ID: " + id));
+        .findById(id)
+        .orElseThrow(() -> new TrainEatRepeatException("Exercise not found with ID: " + id));
   }
 
   public ExerciseResponse updateExercise(String id, ExerciseRequest request) {
@@ -46,7 +47,8 @@ public class ExerciseService {
 
     var exerciseWithSameName = exerciseRepository.findByNameIgnoreCase(request.name());
     if (exerciseWithSameName.isPresent() && !exerciseWithSameName.get().getId().equals(id)) {
-      throw new TrainEatRepeatException("Exercise with name '" + request.name() + "' already exists");
+      throw new TrainEatRepeatException(
+          "Exercise with name '" + request.name() + "' already exists");
     }
 
     existingExercise.setName(request.name());
@@ -57,9 +59,6 @@ public class ExerciseService {
   }
 
   public void deleteExercise(String id) {
-    if (id == null || id.isEmpty()) {
-      throw new TrainEatRepeatException("Exercise ID cannot be null or empty");
-    }
     if (!exerciseRepository.existsById(id)) {
       throw new TrainEatRepeatException("Exercise not found with ID: " + id);
     }

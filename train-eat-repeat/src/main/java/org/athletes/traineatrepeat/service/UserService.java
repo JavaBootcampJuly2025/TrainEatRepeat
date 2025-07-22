@@ -25,11 +25,8 @@ public class UserService implements UserDetailsService {
   private final TrainingService trainingService;
 
   public UserResponse getUser(String uuid) {
-    if (uuid == null || uuid.isBlank()) {
-      throw new TrainEatRepeatException("User UUID cannot be null or empty");
-    }
     var user = useRepository.getUserByUuid(uuid);
-    if (user == null) {
+    if (!useRepository.existsById(uuid)) {
       throw new TrainEatRepeatException("User not found with UUID: " + uuid);
     }
     return userConverter.convertToUserDTO(user);
@@ -44,10 +41,6 @@ public class UserService implements UserDetailsService {
   }
 
   public UserNutritionStatisticsResponse getNutritionStatistics(String uuid, TimePeriod period) {
-    if (uuid == null || uuid.isBlank()) {
-      throw new TrainEatRepeatException("User UUID cannot be null or empty");
-    }
-
     if (!useRepository.existsById(uuid)) {
       throw new TrainEatRepeatException("User not found with UUID: " + uuid);
     }
@@ -55,10 +48,6 @@ public class UserService implements UserDetailsService {
   }
 
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
-    if (uuid == null || uuid.isBlank()) {
-      throw new TrainEatRepeatException("User UUID cannot be null or empty");
-    }
-
     if (!useRepository.existsById(uuid)) {
       throw new TrainEatRepeatException("User not found with UUID: " + uuid);
     }

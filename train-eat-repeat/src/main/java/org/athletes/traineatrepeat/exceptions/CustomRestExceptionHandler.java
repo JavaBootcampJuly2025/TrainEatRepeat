@@ -9,23 +9,18 @@ import org.springframework.web.reactive.result.method.annotation.ResponseEntityE
 @ControllerAdvice
 public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(TrainEatRepeatException.class)
-    public ResponseEntity<ApiError> handleTrainEatRepeatException(TrainEatRepeatException ex) {
-        ApiError apiError = new ApiError(
-                HttpStatus.BAD_REQUEST,
-                ex.getMessage(),
-                "Custom application error"
-        );
-        return new ResponseEntity<>(apiError, apiError.getStatus());
-    }
+  @ExceptionHandler(TrainEatRepeatException.class)
+  public ResponseEntity<ApiError> handleTrainEatRepeatException(TrainEatRepeatException ex) {
+    ApiError apiError =
+        new ApiError(HttpStatus.BAD_REQUEST, ex.getMessage(), "Custom application error");
+    return new ResponseEntity<>(apiError, apiError.getStatus());
+  }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiError> handleGenericException(Exception ex) {
-        ApiError apiError = new ApiError(
-                HttpStatus.INTERNAL_SERVER_ERROR,
-                ex.getMessage(),
-                "An unexpected error occurred"
-        );
-        return new ResponseEntity<>(apiError, apiError.getStatus());
-    }
+  @ExceptionHandler(Exception.class)
+  public ResponseEntity<ApiError> handleGenericException(Exception ex) {
+    ApiError apiError =
+        new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage(), "An unexpected error occurred");
+    return new ResponseEntity<>(apiError, apiError.getStatus());
+  }
 }
