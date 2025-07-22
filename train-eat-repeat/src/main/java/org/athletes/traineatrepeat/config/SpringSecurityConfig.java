@@ -15,24 +15,25 @@ public class SpringSecurityConfig {
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
     return http.authorizeHttpRequests(
-            auth ->
-                auth.requestMatchers(
-                        "/api/public/**",
-                        "/register",
-                        "/login",
-                        "/css/**",
-                        "/js/**",
-                        "/h2-console/**")
-                    .permitAll()
-                    .requestMatchers("/", "/contact", "/store/**", "/logout")
-                    .permitAll()
-                    .anyRequest()
-                    .authenticated())
-        .formLogin(form -> form.usernameParameter("email").defaultSuccessUrl("/", true))
-        .logout(logout -> logout.logoutSuccessUrl("/"))
-        .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
-        .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-        .build();
+                    auth ->
+                            auth.requestMatchers(
+                                            "/api/public/**",
+                                            "/register",
+                                            "/login",
+                                            "/verify-email",
+                                            "/css/**",
+                                            "/js/**",
+                                            "/h2-console/**")
+                                    .permitAll()
+                                    .requestMatchers("/", "/contact", "/store/**", "/logout")
+                                    .permitAll()
+                                    .anyRequest()
+                                    .authenticated())
+            .formLogin(form -> form.usernameParameter("email").defaultSuccessUrl("/", true))
+            .logout(logout -> logout.logoutSuccessUrl("/"))
+            .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
+            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+            .build();
   }
 
   @Bean

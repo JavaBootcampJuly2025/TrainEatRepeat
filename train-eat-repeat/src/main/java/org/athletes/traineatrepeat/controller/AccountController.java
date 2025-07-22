@@ -26,13 +26,18 @@ public class AccountController {
 
   @PostMapping("/register")
   public String register(
-      @Valid @ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result) {
-    accountService.registerUser(registerDto, result);
+          @Valid @ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result, Model model) {
+    try {
+      accountService.registerUser(registerDto, result);
 
-    if (result.hasErrors()) {
+      if (result.hasErrors()) {
+        return "register";
+      }
+
+      return "redirect:/verify-email?email=" + registerDto.email();
+    } catch (Exception e) {
+      model.addAttribute("error", "Failed to send verification email. Please try again.");
       return "register";
     }
-
-    return "redirect:/login";
   }
 }
