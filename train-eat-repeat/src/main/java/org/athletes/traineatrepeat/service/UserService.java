@@ -8,11 +8,15 @@ import org.athletes.traineatrepeat.model.response.UserNutritionStatisticsRespons
 import org.athletes.traineatrepeat.model.response.UserResponse;
 import org.athletes.traineatrepeat.model.response.UserTrainingStatisticsResponse;
 import org.athletes.traineatrepeat.repository.UserRepository;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService implements UserDetailsService {
 
   private final UserRepository useRepository;
   private final UserConverter userConverter;
@@ -35,5 +39,18 @@ public class UserService {
 
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
     return trainingService.getTrainingStatistics(uuid, period);
+  }
+
+  @Override
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    var user = useRepository.findByEmail(email);
+
+    if (user != null) {
+      return User.withUsername(user.getEmail())
+          .password(user.getPassword())
+          .roles(user.getRole())
+          .build();
+    }
+    return null;
   }
 }

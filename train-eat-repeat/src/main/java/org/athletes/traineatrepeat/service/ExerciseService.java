@@ -29,8 +29,8 @@ public class ExerciseService {
 
   public ExerciseDTO getExerciseById(String id) {
     return exerciseRepository
-            .findById(id)
-            .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
+        .findById(id)
+        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
   }
 
   public ExerciseResponse updateExercise(String id, ExerciseRequest request) {

@@ -12,24 +12,27 @@ import lombok.*;
 public class UserDTO {
 
   @Id
+  @GeneratedValue(strategy = GenerationType.UUID)
   @Column(length = 36)
   private String uuid;
 
+  @Column(unique = true, nullable = false)
   private String username;
+
+  @Column(unique = true, nullable = false)
+  private String email;
+
   private String password;
   private int age;
   private String gender;
-
-  // TODO: add together with training data
-  //    @ElementCollection
-  //    private List<String> chronicDiseases;
-  // TODO: add together with food data
-  //    @ElementCollection
-  //    private List<String> foodPreferences;
-
   private float weight;
   private float height;
-  private float BMI;
-  private float BMR;
+
+  @Column(name = "BMI")
+  private float bmi;
+
+  @Column(name = "BMR")
+  private float bmr;
+
   private String role;
 }

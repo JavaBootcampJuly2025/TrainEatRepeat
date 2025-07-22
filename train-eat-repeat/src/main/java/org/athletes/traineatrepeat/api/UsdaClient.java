@@ -17,22 +17,23 @@ public class UsdaClient {
 
   private WebClient webClient() {
     return WebClient.builder()
-            .baseUrl(usdaConfig.getBaseUrl())
-            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-            .build();
+        .baseUrl(usdaConfig.getBaseUrl())
+        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+        .build();
   }
 
   public UsdaSearchResponse searchFood(String query) {
-    var responseMono = webClient()
+    var responseMono =
+        webClient()
             .get()
             .uri(
-                    uriBuilder ->
-                            uriBuilder
-                                    .path(usdaConfig.getEndpoints().getFoodSearch())
-                                    .queryParam("api_key", usdaConfig.getKey())
-                                    .queryParam("query", query)
-                                    .queryParam("pageSize", 1)
-                                    .build())
+                uriBuilder ->
+                    uriBuilder
+                        .path(usdaConfig.getEndpoints().getFoodSearch())
+                        .queryParam("api_key", usdaConfig.getKey())
+                        .queryParam("query", query)
+                        .queryParam("pageSize", 1)
+                        .build())
             .retrieve()
             .bodyToMono(UsdaSearchResponse.class)
             .onErrorResume(e -> Mono.empty());
