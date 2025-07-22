@@ -3,7 +3,8 @@ VALUES ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'password123', 28, '
        ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'jane_smith', 'securepass', 25, 'Female', 60.0, 165.0, 22.04, 1400.0, 'admin'),
        ('123e4567-e89b-12d3-a456-426614174000', 'alex_fitness', 'abc123xyz', 32, 'Male', 82.0, 178.0, 25.88, 1850.0, 'user'),
        ('9c858901-8a57-4791-81fe-4c455b099bc9', 'emma_runner', 'runFast!', 29, 'Female', 55.0, 160.0, 21.48, 1350.0, 'user'),
-       ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'buildIt!', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'user');
+       ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'buildIt!', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'user'),
+       ('123e4567-e89b-12d3-a456-426614174001', 'test', '$2a$12$7RdyG3/KKCA3cnwhKK9wYuurxOHVotgtSjdAOh1lYkEA8a2mgpxiC', 25, 'Male', 70, 180, 21.6, 1500, 'USER');
 
 
 INSERT INTO MEALRECORDS (id, uuid, food_name, calories, carbs, protein, fat, weight_in_grams, date)
