@@ -4,11 +4,13 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import lombok.Builder;
 
+import static org.athletes.traineatrepeat.common.ValidationCommon.UUID_REGEX;
+
 @Builder
 public record TrainingRecordRequest(
     @NotBlank(message = "UUID cannot be empty")
         @Pattern(
-            regexp = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+            regexp = UUID_REGEX,
             message = "Invalid UUID format")
         String uuid,
     @NotBlank(message = "Exercise name cannot be empty") String exercise,

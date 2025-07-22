@@ -1,5 +1,9 @@
 package org.athletes.traineatrepeat.controller;
 
+import static org.athletes.traineatrepeat.common.ValidationCommon.UUID_REGEX;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.TimePeriod;
@@ -7,8 +11,10 @@ import org.athletes.traineatrepeat.model.response.UserNutritionStatisticsRespons
 import org.athletes.traineatrepeat.model.response.UserResponse;
 import org.athletes.traineatrepeat.model.response.UserTrainingStatisticsResponse;
 import org.athletes.traineatrepeat.service.UserService;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/user")
@@ -17,7 +23,9 @@ public class UserController {
   private final UserService userService;
 
   @GetMapping("/user-data")
-  public UserResponse getUserData(@RequestParam String uuid) {
+  public UserResponse getUserData(
+      @RequestParam @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+          String uuid) {
     return userService.getUser(uuid);
   }
 
@@ -39,13 +47,17 @@ public class UserController {
 
   @GetMapping("/meal-statistics")
   public UserNutritionStatisticsResponse getMealStatistics(
-      @RequestParam String uuid, @RequestParam(required = false) TimePeriod period) {
+      @RequestParam @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+          String uuid,
+      @RequestParam(required = false) TimePeriod period) {
     return userService.getNutritionStatistics(uuid, period);
   }
 
   @GetMapping("/training-statistics")
   public UserTrainingStatisticsResponse getTrainingStatistics(
-      @RequestParam String uuid, @RequestParam(required = false) TimePeriod period) {
+      @RequestParam @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+          String uuid,
+      @RequestParam(required = false) TimePeriod period) {
     return userService.getTrainingStatistics(uuid, period);
   }
 }
