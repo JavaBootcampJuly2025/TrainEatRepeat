@@ -36,11 +36,11 @@ public class ExerciseController {
    * specify JSON as media type.
    */
   @PutMapping(
-          value = "/{id}",
-          produces = MediaType.APPLICATION_JSON_VALUE,
-          consumes = MediaType.APPLICATION_JSON_VALUE)
+      value = "/{id}",
+      produces = MediaType.APPLICATION_JSON_VALUE,
+      consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<ExerciseResponse> updateExercise(
-          @PathVariable String id, @RequestBody ExerciseRequest request) {
+      @PathVariable String id, @RequestBody ExerciseRequest request) {
     var response = exerciseService.updateExercise(id, request);
     return ResponseEntity.ok(response);
   }

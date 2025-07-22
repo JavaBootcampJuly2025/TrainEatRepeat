@@ -16,16 +16,23 @@ public class UserDTO {
   @Column(length = 36)
   private String uuid;
 
-  @Column (unique = true, nullable = false)
+  @Column(unique = true, nullable = false)
   private String username;
-  @Column (unique = true, nullable = false)
+
+  @Column(unique = true, nullable = false)
   private String email;
+
   private String password;
   private int age;
   private String gender;
   private float weight;
   private float height;
-  private float BMI;
-  private float BMR;
+
+  @Column(name = "BMI")
+  private float bmi;
+
+  @Column(name = "BMR")
+  private float bmr;
+
   private String role;
 }

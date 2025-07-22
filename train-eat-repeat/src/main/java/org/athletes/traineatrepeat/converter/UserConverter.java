@@ -17,8 +17,8 @@ public class UserConverter {
         // .foodPreferences(user.getFoodPreferences())
         .weight(user.getWeight())
         .height(user.getHeight())
-        .BMI(user.getBMI())
-        .BMR(user.getBMR())
+        .BMI(user.getBmi())
+        .BMR(user.getBmr())
         .role(user.getRole())
         .build();
   }

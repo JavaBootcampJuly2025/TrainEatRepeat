@@ -3,7 +3,6 @@ package org.athletes.traineatrepeat.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.request.RegisterRequest;
-import org.athletes.traineatrepeat.repository.UserRepository;
 import org.athletes.traineatrepeat.service.AccountService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,26 +15,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequiredArgsConstructor
 public class AccountController {
 
-    private final AccountService accountService;
+  private final AccountService accountService;
 
-    @GetMapping("/register")
-    public String register(Model model) {
-        RegisterRequest registerRequest = RegisterRequest.builder().build();
-        model.addAttribute("registerRequest", registerRequest);
-        return "register";
+  @GetMapping("/register")
+  public String register(Model model) {
+    var registerRequest = RegisterRequest.ofInitialRequestForm();
+    model.addAttribute("registerRequest", registerRequest);
+    return "register";
+  }
+
+  @PostMapping("/register")
+  public String register(
+      @Valid @ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result) {
+    accountService.registerUser(registerDto, result);
+
+    if (result.hasErrors()) {
+      return "register";
     }
 
-    @PostMapping("/register")
-    public String register(
-            @Valid @ModelAttribute("registerRequest") RegisterRequest registerDto,
-            BindingResult result
-    ) {
-        accountService.registerUser(registerDto, result);
-
-        if (result.hasErrors()) {
-            return "register";
-        }
-
-        return "redirect:/login";
-    }
+    return "redirect:/login";
+  }
 }

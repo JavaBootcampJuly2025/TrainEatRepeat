@@ -7,17 +7,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class TimeProvider {
 
-    private Optional<LocalDate> overriddenDate = Optional.empty();
+  private Optional<LocalDate> overriddenDate = Optional.empty();
 
-    public LocalDate getCurrentDate() {
-        return overriddenDate.orElse(LocalDate.now());
-    }
+  public LocalDate getCurrentDate() {
+    return overriddenDate.orElse(LocalDate.now());
+  }
 
-    public void setCurrentDate(LocalDate date) {
-        this.overriddenDate = Optional.of(date);
-    }
+  public void setCurrentDate(LocalDate date) {
+    this.overriddenDate = Optional.of(date);
+  }
 
-    public void reset() {
-        this.overriddenDate = Optional.empty();
-    }
+  public void reset() {
+    this.overriddenDate = Optional.empty();
+  }
 }

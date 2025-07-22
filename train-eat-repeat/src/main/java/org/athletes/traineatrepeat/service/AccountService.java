@@ -14,62 +14,59 @@ import org.springframework.validation.FieldError;
 @RequiredArgsConstructor
 public class AccountService {
 
-    private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
-    public void registerUser(@Valid RegisterRequest registerRequest, BindingResult result) {
-        // Password confirmation check
-        if (!registerRequest.getPassword().equals(registerRequest.getConfirmPassword())) {
-            result.addError(new FieldError(
-                    "registerRequest",
-                    "confirmPassword",
-                    "Password and Confirm Password do not match"
-            ));
-        }
-
-        // Email uniqueness check
-        if (userRepository.findByEmail(registerRequest.getEmail()) != null) {
-            result.addError(new FieldError(
-                    "registerRequest",
-                    "email",
-                    "Email address is already used"
-            ));
-        }
-
-        if (result.hasErrors()) {
-            return; // Controller will handle this by checking result.hasErrors()
-        }
-
-        // Calculate BMI & BMR (optional)
-        float bmi = registerRequest.getWeight() / (registerRequest.getHeight() / 100 * registerRequest.getHeight() / 100);
-        float bmr = calculateBMR(registerRequest);
-
-        // Create User entity
-        UserDTO user = UserDTO.builder()
-                .username(registerRequest.getUsername())
-                .email(registerRequest.getEmail())
-                .password(passwordEncoder.encode(registerRequest.getPassword())) // Hash password
-                .age(registerRequest.getAge())
-                .gender(registerRequest.getGender())
-                .weight(registerRequest.getWeight())
-                .height(registerRequest.getHeight())
-                .BMI(bmi)
-                .BMR(bmr)
-                .role("user")
-                .build();
-
-        userRepository.save(user);
+  public void registerUser(@Valid RegisterRequest registerRequest, BindingResult result) {
+    // Password confirmation check
+    if (!registerRequest.password().equals(registerRequest.confirmPassword())) {
+      result.addError(
+          new FieldError(
+              "registerRequest", "confirmPassword", "Password and Confirm Password do not match"));
     }
 
-    private float calculateBMR(RegisterRequest request) {
-        float weight = request.getWeight();
-        float heightCm = request.getHeight();
-        int age = request.getAge();
-
-        if ("male".equalsIgnoreCase(request.getGender())) {
-            return (10 * weight) + (6.25f * heightCm) - (5 * age) + 5;
-        } else {
-            return (10 * weight) + (6.25f * heightCm) - (5 * age) - 161;
-        }
+    // Email uniqueness check
+    if (userRepository.findByEmail(registerRequest.email()) != null) {
+      result.addError(new FieldError("registerRequest", "email", "Email address is already used"));
     }
+
+    if (result.hasErrors()) {
+      return; // Controller will handle this by checking result.hasErrors()
+    }
+
+    // Calculate BMI & BMR (optional)
+    float bmi =
+        registerRequest.weight()
+            / (registerRequest.height() / 100 * registerRequest.height() / 100);
+    float bmr = calculateBMR(registerRequest);
+
+    // Create User entity
+    UserDTO user =
+        UserDTO.builder()
+            .username(registerRequest.username())
+            .email(registerRequest.email())
+            .password(passwordEncoder.encode(registerRequest.password())) // Hash password
+            .age(registerRequest.age())
+            .gender(registerRequest.gender())
+            .weight(registerRequest.weight())
+            .height(registerRequest.height())
+            .bmi(bmi)
+            .bmr(bmr)
+            .role("user")
+            .build();
+
+    userRepository.save(user);
+  }
+
+  private float calculateBMR(RegisterRequest request) {
+    float weight = request.weight();
+    float heightCm = request.height();
+    int age = request.age();
+
+    if ("male".equalsIgnoreCase(request.gender())) {
+      return (10 * weight) + (6.25f * heightCm) - (5 * age) + 5;
+    } else {
+      return (10 * weight) + (6.25f * heightCm) - (5 * age) - 161;
+    }
+  }
 }

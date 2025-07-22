@@ -46,10 +46,10 @@ public class UserService implements UserDetailsService {
     var user = useRepository.findByEmail(email);
 
     if (user != null) {
-        return User .withUsername(user.getEmail())
-                .password(user.getPassword())
-                .roles(user.getRole())
-                .build();
+      return User.withUsername(user.getEmail())
+          .password(user.getPassword())
+          .roles(user.getRole())
+          .build();
     }
     return null;
   }
