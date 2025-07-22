@@ -28,4 +28,19 @@ public class EmailService {
 
         mailSender.send(mimeMessage);
     }
+
+    public void sendPasswordResetEmail(String to, String username, String resetToken) throws MessagingException {
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true);
+
+        helper.setTo(to);
+        helper.setSubject("Password Reset Request");
+        helper.setText(
+                "<h1>Hello, " + username + "!</h1>" +
+                        "<p>You have requested to reset your password. Please click the link below to reset your password:</p>" +
+                        "<p><a href='http://localhost:8080/reset-password?token=" + resetToken + "&email=" + to + "'>Reset Password</a></p>" +
+                        "<p>This link will expire in 24 hours.</p>", true);
+
+        mailSender.send(mimeMessage);
+    }
 }

@@ -1,10 +1,11 @@
-INSERT INTO USERS (uuid, username, email, password, age, gender, weight, height, BMI, BMR, role, verification_code, verification_expires_at, is_email_verified)
+INSERT INTO USERS (
+    uuid, username, email, password, age, gender, weight, height, BMI, BMR, role, verification_code, verification_expires_at, is_email_verified, reset_token, reset_token_expires_at)
 VALUES
-    ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'john@example.com', '$2a$12$nO8flq/fauF.42ik4HK4pu.nKxDaUMEE7oHWptiRrMfo5nwjT3jZ6', 28, 'Male', 75.0, 180.0, 23.15, 1755.0, 'admin', NULL, NULL, FALSE),
-    ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'jane_smith', 'jane@example.com', '$2a$12$jaPvCt88DN33JLHnFK5XCOvH1AjLaOL3JviucafbhDTDoCb1hgkYS', 25, 'Female', 60.0, 165.0, 22.04, 1400.0, 'admin', NULL, NULL, FALSE),
-    ('123e4567-e89b-12d3-a456-426614174000', 'alex_fitness', 'alex@example.com', '$2a$12$FDmRf4QVE0zXwaJKtcTE8O3zyYo2qlKlscuTfNbOus2B0KiSMyzO6', 32, 'Male', 82.0, 178.0, 25.88, 1850.0, 'user', NULL, NULL, FALSE),
-    ('9c858901-8a57-4791-81fe-4c455b099bc9', 'emma_runner', 'emma@example.com', '$2a$12$7o8agat/7Q1rzg6oASfurOZIBaV9aXbEchN.11cZWsbITRPF0biTa', 29, 'Female', 55.0, 160.0, 21.48, 1350.0, 'user', NULL, NULL, FALSE),
-    ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'mike@example.com', '$2a$12$h8XnclJvBwnvoD4XdcpMeeRI6VmTi/UiexOEcjFrcx8TdjcS/.732', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'user', NULL, NULL, FALSE);
+    ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'john@example.com', '$2a$12$nO8flq/fauF.42ik4HK4pu.nKxDaUMEE7oHWptiRrMfo5nwjT3jZ6', 28, 'Male', 75.0, 180.0, 23.15, 1755.0, 'admin', NULL, NULL, FALSE, NULL, NULL),
+    ('f47ac10b-58cc-4372-a567-0e02b2c3d479', 'jane_smith', 'jane@example.com', '$2a$12$jaPvCt88DN33JLHnFK5XCOvH1AjLaOL3JviucafbhDTDoCb1hgkYS', 25, 'Female', 60.0, 165.0, 22.04, 1400.0, 'admin', NULL, NULL, FALSE, NULL, NULL),
+    ('123e4567-e89b-12d3-a456-426614174000', 'alex_fitness', 'alex@example.com', '$2a$12$FDmRf4QVE0zXwaJKtcTE8O3zyYo2qlKlscuTfNbOus2B0KiSMyzO6', 32, 'Male', 82.0, 178.0, 25.88, 1850.0, 'user', NULL, NULL, FALSE, NULL, NULL),
+    ('9c858901-8a57-4791-81fe-4c455b099bc9', 'emma_runner', 'emma@example.com', '$2a$12$7o8agat/7Q1rzg6oASfurOZIBaV9aXbEchN.11cZWsbITRPF0biTa', 29, 'Female', 55.0, 160.0, 21.48, 1350.0, 'user', NULL, NULL, FALSE, NULL, NULL),
+    ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'mike@example.com', '$2a$12$h8XnclJvBwnvoD4XdcpMeeRI6VmTi/UiexOEcjFrcx8TdjcS/.732', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'user', NULL, NULL, FALSE, NULL, NULL);
 
 INSERT INTO MEALRECORDS (id, uuid, food_name, calories, carbs, protein, fat, weight_in_grams, date)
 VALUES  ('a1b2c3d4-e5f6-7890-abcd-1234567890ab', '550e8400-e29b-41d4-a716-446655440000', 'Chicken Salad', 350, 10, 30, 15, 250.0, '2025-07-15'),

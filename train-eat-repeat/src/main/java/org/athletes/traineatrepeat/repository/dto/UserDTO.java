@@ -45,4 +45,10 @@ public class UserDTO {
 
   @Column(name = "is_email_verified")
   private boolean isEmailVerified;
+
+  @Column(name = "reset_token")
+  private String resetToken;
+
+  @Column(name = "reset_token_expires_at")
+  private LocalDateTime resetTokenExpiresAt;
 }

@@ -97,6 +97,55 @@ public class AccountService {
     return false;
   }
 
+  public boolean initiatePasswordReset(String email){
+    UserDTO user = userRepository.findByEmail(email);
+    if (user == null || !user.isEmailVerified()) {
+      return false;
+    }
+
+    String resetToken = UUID.randomUUID().toString();
+    LocalDateTime resetTokenExpiresAt = LocalDateTime.now().plusHours(24);
+
+    user.setResetToken(resetToken);
+    user.setResetTokenExpiresAt(resetTokenExpiresAt);
+    userRepository.save(user);
+
+    try {
+      emailService.sendPasswordResetEmail(email, user.getUsername(), resetToken);
+    } catch (Exception e) {
+      user.setResetToken(null);
+      user.setResetTokenExpiresAt(null);
+      userRepository.save(user);
+      return false;
+    }
+    return true;
+  }
+
+  public boolean validateResetToken(String email, String token) {
+    UserDTO user = userRepository.findByEmail(email);
+    if (user == null) {
+      return false;
+    }
+
+    return user.getResetToken() != null
+            && user.getResetToken().equals(token)
+            && user.getResetTokenExpiresAt() != null
+            && LocalDateTime.now().isBefore(user.getResetTokenExpiresAt());
+  }
+
+  public boolean resetPassword(String email, String token, String newPassword) {
+    UserDTO user = userRepository.findByEmail(email);
+    if (user == null || !validateResetToken(email, token)) {
+      return false;
+    }
+
+    user.setPassword(passwordEncoder.encode(newPassword));
+    user.setResetToken(null);
+    user.setResetTokenExpiresAt(null);
+    userRepository.save(user);
+    return true;
+  }
+
   private float calculateBMR(RegisterRequest request) {
     float weight = request.weight();
     float heightCm = request.height();

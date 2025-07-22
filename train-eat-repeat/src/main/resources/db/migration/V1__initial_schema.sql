@@ -13,7 +13,9 @@ CREATE TABLE USERS
     role     VARCHAR(255),
     verification_code VARCHAR(36),
     verification_expires_at TIMESTAMP,
-    is_email_verified BOOLEAN DEFAULT FALSE
+    is_email_verified BOOLEAN DEFAULT FALSE,
+    reset_token VARCHAR(36),
+    reset_token_expires_at TIMESTAMP
 );
 
 CREATE TABLE MEALRECORDS
