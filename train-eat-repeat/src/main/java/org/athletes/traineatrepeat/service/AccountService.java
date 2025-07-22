@@ -18,29 +18,19 @@ public class AccountService {
   private final PasswordEncoder passwordEncoder;
 
   public void registerUser(@Valid RegisterRequest registerRequest, BindingResult result) {
-    // Password confirmation check
-    if (!registerRequest.password().equals(registerRequest.confirmPassword())) {
-      result.addError(
-          new FieldError(
-              "registerRequest", "confirmPassword", "Password and Confirm Password do not match"));
-    }
-
-    // Email uniqueness check
     if (userRepository.findByEmail(registerRequest.email()) != null) {
       result.addError(new FieldError("registerRequest", "email", "Email address is already used"));
     }
 
     if (result.hasErrors()) {
-      return; // Controller will handle this by checking result.hasErrors()
+      return;
     }
 
-    // Calculate BMI & BMR (optional)
     float bmi =
         registerRequest.weight()
             / (registerRequest.height() / 100 * registerRequest.height() / 100);
     float bmr = calculateBMR(registerRequest);
 
-    // Create User entity
     UserDTO user =
         UserDTO.builder()
             .username(registerRequest.username())
