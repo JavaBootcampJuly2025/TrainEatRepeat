@@ -27,14 +27,14 @@ public class ExerciseService {
     return exercises.stream().map(exerciseConverter::toResponseFromEntity).toList();
   }
 
-  public ExerciseDTO getExerciseById(String id) {
+  private ExerciseDTO getExerciseEntityById(String id) {
     return exerciseRepository
-        .findById(id)
-        .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
+            .findById(id)
+            .orElseThrow(() -> new RuntimeException("Exercise not found with ID: " + id));
   }
 
   public ExerciseResponse updateExercise(String id, ExerciseRequest request) {
-    var existingExercise = getExerciseById(id);
+    ExerciseDTO existingExercise = getExerciseEntityById(id);
 
     existingExercise.setName(request.name());
     existingExercise.setMET(request.met());
