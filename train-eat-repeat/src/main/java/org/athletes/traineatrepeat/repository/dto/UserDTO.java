@@ -2,6 +2,7 @@ package org.athletes.traineatrepeat.repository.dto;
 
 import jakarta.persistence.*;
 import lombok.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "USERS")
@@ -35,4 +36,13 @@ public class UserDTO {
   private float bmr;
 
   private String role;
+
+  @Column(name = "verification_code")
+  private String verificationCode;
+
+  @Column(name = "verification_expires_at")
+  private LocalDateTime verificationExpiresAt;
+
+  @Column(name = "is_email_verified")
+  private boolean isEmailVerified;
 }
