@@ -27,7 +27,7 @@ public class MealService {
   private final MealRecordRepository mealRecordRepository;
   private final MealRecordConverter mealRecordConverter;
   private final UsdaClient usdaClient;
-    private final TimeProvider timeProvider;
+  private final TimeProvider timeProvider;
 
   private Map<Nutrients, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
     var usdaResponse = usdaClient.searchFood(foodName);

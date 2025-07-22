@@ -1,17 +1,15 @@
 package org.athletes.traineatrepeat.model.request;
 
+import static org.athletes.traineatrepeat.common.ValidationCommon.UUID_REGEX;
+
 import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import lombok.Builder;
 
-import static org.athletes.traineatrepeat.common.ValidationCommon.UUID_REGEX;
-
 @Builder
 public record TrainingRecordRequest(
     @NotBlank(message = "UUID cannot be empty")
-        @Pattern(
-            regexp = UUID_REGEX,
-            message = "Invalid UUID format")
+        @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
         String uuid,
     @NotBlank(message = "Exercise name cannot be empty") String exercise,
     @PositiveOrZero(message = "Duration must be greater than 0") float duration,
