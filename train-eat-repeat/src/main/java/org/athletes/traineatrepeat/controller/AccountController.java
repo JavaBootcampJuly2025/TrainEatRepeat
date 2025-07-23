@@ -1,6 +1,5 @@
 package org.athletes.traineatrepeat.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.request.RegisterRequest;
 import org.athletes.traineatrepeat.service.AccountService;
@@ -19,25 +18,11 @@ public class AccountController {
 
   @GetMapping("/register")
   public String register(Model model) {
-    var registerRequest = RegisterRequest.ofInitialRequestForm();
-    model.addAttribute("registerRequest", registerRequest);
-    return "register";
+      return accountService.prepareRegistrationForm(model);
   }
 
   @PostMapping("/register")
-  public String register(
-          @Valid @ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result, Model model) {
-    try {
-      accountService.registerUser(registerDto, result);
-
-      if (result.hasErrors()) {
-        return "register";
-      }
-
-      return "redirect:/verify-email?email=" + registerDto.email();
-    } catch (Exception e) {
-      model.addAttribute("error", "Failed to send verification email. Please try again.");
-      return "register";
-    }
+  public String register(@ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result, Model model) {
+    return accountService.registerUser(registerDto, result, model);
   }
 }
