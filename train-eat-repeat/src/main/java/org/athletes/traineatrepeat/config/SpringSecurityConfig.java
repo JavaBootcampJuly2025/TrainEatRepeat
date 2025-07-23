@@ -20,6 +20,7 @@ public class SpringSecurityConfig {
                                             "/api/public/**",
                                             "/register",
                                             "/login",
+                                            "/verify-email",
                                             "/css/**",
                                             "/js/**",
                                             "/h2-console/**")
@@ -28,11 +29,7 @@ public class SpringSecurityConfig {
                                     .permitAll()
                                     .anyRequest()
                                     .authenticated())
-            .formLogin(form -> form
-                    .loginPage("/login")
-                    .usernameParameter("email")
-                    .defaultSuccessUrl("/", true)
-                    .permitAll())
+            .formLogin(form -> form.usernameParameter("email").defaultSuccessUrl("/", true))
             .logout(logout -> logout.logoutSuccessUrl("/"))
             .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))

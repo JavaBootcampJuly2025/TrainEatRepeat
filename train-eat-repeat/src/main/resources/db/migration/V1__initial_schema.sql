@@ -10,7 +10,10 @@ CREATE TABLE USERS
     height   FLOAT,
     BMI      FLOAT,
     BMR      FLOAT,
-    role     VARCHAR(255)
+    role     VARCHAR(255),
+    verification_code VARCHAR(36),
+    verification_expires_at TIMESTAMP,
+    is_email_verified BOOLEAN DEFAULT FALSE
 );
 
 CREATE TABLE MEALRECORDS

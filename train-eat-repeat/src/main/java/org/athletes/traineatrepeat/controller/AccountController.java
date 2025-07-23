@@ -1,6 +1,5 @@
 package org.athletes.traineatrepeat.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.model.request.RegisterRequest;
 import org.athletes.traineatrepeat.service.AccountService;
@@ -19,25 +18,11 @@ public class AccountController {
 
   @GetMapping("/register")
   public String register(Model model) {
-    var registerRequest = RegisterRequest.ofInitialRequestForm();
-    model.addAttribute("registerRequest", registerRequest);
-    return "register";
+      return accountService.prepareRegistrationForm(model);
   }
 
   @PostMapping("/register")
-  public String register(
-      @Valid @ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result) {
-    accountService.registerUser(registerDto, result);
-
-    if (result.hasErrors()) {
-      return "register";
-    }
-
-    return "redirect:/login";
-  }
-
-  @GetMapping("/login")
-  public String loginPage() {
-    return "login";
+  public String register(@ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result, Model model) {
+    return accountService.registerUser(registerDto, result, model);
   }
 }
