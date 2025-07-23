@@ -8,50 +8,63 @@
 
   <style>
     body {
-      background-color: #f8f9fa;
-      font-size: 0.95rem;
+      background: linear-gradient(to right, #7b2ff7, #4facfe);
+      font-size: 0.9rem;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .form-container {
-      max-width: 480px;
-      padding: 1.5rem 2rem;
+      background-color: white;
+      border-radius: 0.85rem;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 360px;
     }
 
     .form-label {
       font-weight: 500;
-      font-size: 0.95rem;
-      margin-bottom: 0.2rem;
+      font-size: 0.9rem;
     }
 
     .form-control, .form-select {
-      padding: 0.45rem 0.75rem;
-      font-size: 0.95rem;
+      padding: 0.4rem 0.65rem;
+      font-size: 0.9rem;
+      border-radius: 0.45rem;
     }
 
     .btn {
+      font-size: 0.9rem;
       padding: 0.5rem;
-      font-size: 0.95rem;
-    }
-
-    h2 {
-      font-size: 1.6rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .text-small {
-      font-size: 0.85rem;
+      border-radius: 0.45rem;
     }
 
     .form-group {
       margin-bottom: 0.9rem;
     }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 0.9rem;
+      font-size: 1.4rem;
+    }
+
+    .text-muted a {
+      text-decoration: none;
+    }
+
+    .text-muted a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 
-<body class="d-flex align-items-center justify-content-center min-vh-100">
-<div class="form-container bg-white rounded-4 shadow-sm">
-  <h2 class="text-center">Sign up</h2>
-  <hr />
+<body>
+<div class="form-container">
+  <h2>Sign up</h2>
 
   <form method="post" th:object="${registerRequest}">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
