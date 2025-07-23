@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintValidatorContext;
 import org.athletes.traineatrepeat.model.request.RegisterRequest;
 
 public class PasswordMatchesValidator
-        implements ConstraintValidator<PasswordMatches, RegisterRequest> {
+    implements ConstraintValidator<PasswordMatches, RegisterRequest> {
 
   @Override
   public boolean isValid(RegisterRequest request, ConstraintValidatorContext context) {
@@ -17,9 +17,10 @@ public class PasswordMatchesValidator
 
     if (!matches) {
       context.disableDefaultConstraintViolation();
-      context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
-              .addPropertyNode("confirmPassword")
-              .addConstraintViolation();
+      context
+          .buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+          .addPropertyNode("confirmPassword")
+          .addConstraintViolation();
     }
 
     return matches;
