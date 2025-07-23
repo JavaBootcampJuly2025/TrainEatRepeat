@@ -79,6 +79,51 @@ public class AccountService {
     }
   }
 
+  public String prepareVerificationPage(String email, Model model) {
+    validateEmailFormat(email, model);
+    if (model.containsAttribute("error")) {
+      return "verify-email";
+    }
+    model.addAttribute("email", email);
+    return "verify-email";
+  }
+
+  public String verifyEmail(String email, String code, Model model) {
+    validateEmailFormat(email, model);
+    validateVerificationCode(code, model);
+
+    if (model.containsAttribute("error")) {
+      model.addAttribute("email", email);
+      return "verify-email";
+    }
+
+    UserDTO user = userRepository.findByEmail(email);
+    if (user == null) {
+      model.addAttribute("error", "No user found with this email");
+      model.addAttribute("email", email);
+      return "verify-email";
+    }
+
+    if (user.isEmailVerified()) {
+      return "redirect:/login";
+    }
+
+    if (user.getVerificationCode() != null
+            && user.getVerificationCode().equals(code)
+            && user.getVerificationExpiresAt() != null
+            && LocalDateTime.now().isBefore(user.getVerificationExpiresAt())) {
+      user.setEmailVerified(true);
+      user.setVerificationCode(null);
+      user.setVerificationExpiresAt(null);
+      userRepository.save(user);
+      return "redirect:/login";
+    }
+
+    model.addAttribute("error", "Invalid or expired verification code");
+    model.addAttribute("email", email);
+    return "verify-email";
+  }
+
   private void validateUsername(String username, BindingResult result) {
     if (StringUtils.isEmpty(username)) {
       result.addError(new FieldError("registerRequest", "username", "Username is required"));
@@ -139,27 +184,18 @@ public class AccountService {
     }
   }
 
-  public boolean verifyEmail(String email, String code) {
-    UserDTO user = userRepository.findByEmail(email);
-    if (user == null) {
-      return false;
+  private void validateEmailFormat(String email, Model model) {
+    if (StringUtils.isEmpty(email)) {
+      model.addAttribute("error", "Email is required");
+    } else if (!email.matches(EMAIL_REGEX)) {
+      model.addAttribute("error", "Invalid email format");
     }
+  }
 
-    if (user.isEmailVerified()) {
-      return true;
+  private void validateVerificationCode(String code, Model model) {
+    if (StringUtils.isEmpty(code)) {
+      model.addAttribute("error", "Verification code is required");
     }
-
-    if (user.getVerificationCode() != null
-            && user.getVerificationCode().equals(code)
-            && user.getVerificationExpiresAt() != null
-            && LocalDateTime.now().isBefore(user.getVerificationExpiresAt())) {
-      user.setEmailVerified(true);
-      user.setVerificationCode(null);
-      user.setVerificationExpiresAt(null);
-      userRepository.save(user);
-      return true;
-    }
-    return false;
   }
 
   private float calculateBMR(RegisterRequest request) {

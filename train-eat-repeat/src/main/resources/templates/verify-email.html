@@ -5,18 +5,20 @@
   <title>Email Verification</title>
 </head>
 <body>
-<h1>Email Verification</h1>
-<p>Please enter the verification code sent to your email: <span th:text="${email}"></span></p>
-
-<div th:if="${error}" style="color: red;">
-  <p th:text="${error}"></p>
+<div>
+  <h1>Email Verification</h1>
+  <p>Please enter the verification code sent to <span th:text="${email}"></span></p>
+  <div th:if="${error}" th:text="${error}" style="color: red;"></div>
+  <form th:action="@{/verify-email}" method="post">
+    <input type="hidden" name="email" th:value="${email}" />
+    <div>
+      <label for="code">Verification Code*</label>
+      <input type="text" id="code" name="code" />
+    </div>
+    <div>
+      <button type="submit">Verify</button>
+    </div>
+  </form>
 </div>
-
-<form th:action="@{/verify-email}" method="post">
-  <input type="hidden" name="email" th:value="${email}">
-  <label for="code">Verification Code:</label>
-  <input type="text" id="code" name="code" required>
-  <button type="submit">Verify</button>
-</form>
 </body>
 </html>
