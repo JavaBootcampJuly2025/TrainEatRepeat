@@ -156,12 +156,12 @@ public class TrainingService {
   }
 
   private List<TrainingDTO> getTrainingsForToday(String uuid) {
-    var today = LocalDate.now();
+    LocalDate today = timeProvider.getCurrentDate();
     return trainingRecordRepository.findAllByUuidAndDate(uuid, today);
   }
 
   private List<TrainingDTO> getTrainingsForWeek(String uuid) {
-    var today = LocalDate.now();
+    LocalDate today = timeProvider.getCurrentDate();
     var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
     var endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
 
@@ -169,7 +169,7 @@ public class TrainingService {
   }
 
   private List<TrainingDTO> getTrainingsForMonth(String uuid) {
-    var today = LocalDate.now();
+    LocalDate today = timeProvider.getCurrentDate();
     var startOfMonth = today.withDayOfMonth(1);
     var endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 

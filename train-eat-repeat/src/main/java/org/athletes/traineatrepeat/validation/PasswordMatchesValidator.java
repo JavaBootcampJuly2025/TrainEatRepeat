@@ -12,6 +12,17 @@ public class PasswordMatchesValidator
     if (request.password() == null || request.confirmPassword() == null) {
       return false;
     }
-    return request.password().equals(request.confirmPassword());
+
+    boolean matches = request.password().equals(request.confirmPassword());
+
+    if (!matches) {
+      context.disableDefaultConstraintViolation();
+      context
+          .buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate())
+          .addPropertyNode("confirmPassword")
+          .addConstraintViolation();
+    }
+
+    return matches;
   }
 }

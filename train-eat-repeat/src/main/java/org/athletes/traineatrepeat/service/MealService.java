@@ -16,6 +16,7 @@ import org.athletes.traineatrepeat.model.response.MealRecordResponse;
 import org.athletes.traineatrepeat.model.response.UserNutritionStatisticsResponse;
 import org.athletes.traineatrepeat.repository.MealRecordRepository;
 import org.athletes.traineatrepeat.repository.dto.MealDTO;
+import org.athletes.traineatrepeat.util.TimeProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -26,6 +27,7 @@ public class MealService {
   private final MealRecordRepository mealRecordRepository;
   private final MealRecordConverter mealRecordConverter;
   private final UsdaClient usdaClient;
+  private final TimeProvider timeProvider;
 
   private Map<Nutrients, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
     var usdaResponse = usdaClient.searchFood(foodName);
@@ -66,7 +68,7 @@ public class MealService {
     if (request.foodName() == null || request.foodName().isBlank()) {
       throw new TrainEatRepeatException("Food name cannot be null or empty");
     }
-
+    LocalDate today = timeProvider.getCurrentDate();
     var nutrition = calculateNutritionalValues(request.foodName(), request.weightInGrams());
     var mealToSave =
         MealDTO.builder()
@@ -78,7 +80,7 @@ public class MealService {
             .protein(nutrition.get(Nutrients.PROTEIN))
             .fat(nutrition.get(Nutrients.FAT))
             .weightInGrams(request.weightInGrams())
-            .date(request.date() != null ? request.date() : LocalDate.now())
+            .date(request.date() != null ? request.date() : today)
             .build();
 
     var savedMeal = mealRecordRepository.save(mealToSave);
@@ -156,13 +158,14 @@ public class MealService {
   }
 
   public MealRecordResponse updateMeal(String mealId, MealRecordRequest request) {
+    LocalDate today = timeProvider.getCurrentDate();
     var existingMeal =
         mealRecordRepository
             .findById(mealId)
             .orElseThrow(() -> new TrainEatRepeatException("Meal not found with ID: " + mealId));
 
     existingMeal.setFoodName(request.foodName());
-    existingMeal.setDate(request.date() != null ? request.date() : LocalDate.now());
+    existingMeal.setDate(request.date() != null ? request.date() : today);
 
     var nutrition = calculateNutritionalValues(request.foodName(), request.weightInGrams());
 
@@ -176,19 +179,19 @@ public class MealService {
   }
 
   private List<MealDTO> getMealsForToday(String uuid) {
-    var today = LocalDate.now();
+    LocalDate today = timeProvider.getCurrentDate();
     return mealRecordRepository.findAllByUuidAndDate(uuid, today);
   }
 
   private List<MealDTO> getMealsForWeek(String uuid) {
-    var today = LocalDate.now();
+    LocalDate today = timeProvider.getCurrentDate();
     var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
     var endOfWeek = today.with(java.time.DayOfWeek.SUNDAY);
     return mealRecordRepository.findMealsByUuidAndDateBetween(uuid, startOfWeek, endOfWeek);
   }
 
   private List<MealDTO> getMealsForMonth(String uuid) {
-    var today = LocalDate.now();
+    LocalDate today = timeProvider.getCurrentDate();
     var startOfMonth = today.withDayOfMonth(1);
     var endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
     return mealRecordRepository.findMealsByUuidAndDateBetween(uuid, startOfMonth, endOfMonth);
