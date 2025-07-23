@@ -5,6 +5,7 @@ VALUES  ('550e8400-e29b-41d4-a716-446655440000', 'john_doe', 'john@example.com',
         ('9c858901-8a57-4791-81fe-4c455b099bc9', 'emma_runner', 'emma@example.com', '$2a$12$7o8agat/7Q1rzg6oASfurOZIBaV9aXbEchN.11cZWsbITRPF0biTa', 29, 'Female', 55.0, 160.0, 21.48, 1350.0, 'user'),
         ('16fd2706-8baf-433b-82eb-8c7fada847da', 'mike_builder', 'mike@example.com', '$2a$12$h8XnclJvBwnvoD4XdcpMeeRI6VmTi/UiexOEcjFrcx8TdjcS/.732', 35, 'Male', 90.0, 185.0, 26.29, 1950.0, 'user');
 
+-- password123 / securepass / abc123xyz / runFast! / buildIt!
 
 INSERT INTO MEALRECORDS (id, uuid, food_name, calories, carbs, protein, fat, weight_in_grams, date)
 VALUES  ('a1b2c3d4-e5f6-7890-abcd-1234567890ab', '550e8400-e29b-41d4-a716-446655440000', 'Chicken Salad', 350, 10, 30, 15, 250.0, '2025-07-15'),
