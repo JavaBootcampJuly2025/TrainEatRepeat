@@ -32,7 +32,8 @@ public class PasswordResetService {
   public String handlePasswordResetRequest(PasswordResetRequest request, Model model) {
     PasswordResetResult result = initiatePasswordReset(request.email());
     if (result != PasswordResetResult.SUCCESS) {
-      String errorMessage = result == PasswordResetResult.USER_NOT_FOUND
+      String errorMessage =
+          result == PasswordResetResult.USER_NOT_FOUND
               ? "No user found with this email address."
               : "Failed to send password reset email. Please try again.";
       model.addAttribute(ERROR_ATTRIBUTE, errorMessage);

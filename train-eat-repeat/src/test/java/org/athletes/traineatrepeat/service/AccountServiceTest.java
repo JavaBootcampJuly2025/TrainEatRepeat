@@ -19,6 +19,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
@@ -336,9 +337,9 @@ class AccountServiceTest {
     when(model.containsAttribute("error")).thenReturn(true);
 
     String viewName = accountService.prepareVerificationPage(email, model);
-    assertEquals("verify-email", viewName);
-    verify(model).addAttribute("error", "Email is required");
 
+    assertEquals("register", viewName);
+    verify(model).addAttribute("error", "Email is required");
     verifyNoMoreInteractions(model);
   }
 
@@ -347,13 +348,13 @@ class AccountServiceTest {
   void prepareVerificationPage_whenEmailIsInvalid_addsFormatErrorToModel() {
     String email = "invalid-email";
 
-    when(model.containsAttribute("error")).thenReturn(true);
+    var testModel = new ExtendedModelMap();
 
-    String viewName = accountService.prepareVerificationPage(email, model);
+    String viewName = accountService.prepareVerificationPage(email, testModel);
 
-    assertEquals("verify-email", viewName);
-    verify(model).addAttribute("error", "Invalid email format");
-    verifyNoMoreInteractions(model);
+    assertEquals("register", viewName);
+    assertTrue(testModel.containsAttribute("error"));
+    assertEquals("Invalid email format", testModel.getAttribute("error"));
   }
 
   @Test

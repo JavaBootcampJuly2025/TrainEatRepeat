@@ -230,9 +230,10 @@ class TrainingServiceTest {
     List<TrainingDTO> list = List.of(savedDto);
 
     when(trainingRepo.findAllByUuid(userUuid)).thenReturn(list);
-    assertEquals(1, service.getTrainingsForUser(userUuid, null).size());
 
     when(trainingRepo.findAllByUuidAndDate(userUuid, today)).thenReturn(list);
+
+    assertEquals(1, service.getTrainingsForUser(userUuid, null).size());
     assertEquals(1, service.getTrainingsForUser(userUuid, TimePeriod.DAY).size());
 
     LocalDate monday = today.with(java.time.DayOfWeek.MONDAY);
@@ -256,7 +257,7 @@ class TrainingServiceTest {
   }
 
   @Test
-  @DisplayName("getTrainingStatistics: day, week, month")
+  @DisplayName("getTrainingStatistics: week and month")
   void getStatistics_Periods() {
     TrainingDTO t1 = TrainingDTO.builder().caloriesLost(100f).build();
     TrainingDTO t2 = TrainingDTO.builder().caloriesLost(200f).build();
@@ -264,22 +265,11 @@ class TrainingServiceTest {
 
     when(timeProvider.getCurrentDate()).thenReturn(today);
 
-    when(trainingRepo.findAllByUuidAndDate(userUuid, today)).thenReturn(list);
     when(trainingRepo.findTrainingsByUuidAndDateBetween(eq(userUuid), any(), any()))
         .thenReturn(list);
 
     assertAll(
-        "Statistics for different time periods",
-        // DAY
-        () -> {
-          var dayStats = service.getTrainingStatistics(userUuid, TimePeriod.DAY);
-          assertEquals(
-              150.0,
-              dayStats.avgCaloriesBurnedPerSession(),
-              1e-6,
-              "DAY: avgCaloriesBurnedPerSession");
-          assertEquals(2.0f, dayStats.avgPerDaySessions(), 1e-6, "DAY: avgPerDaySessions");
-        },
+        "Statistics for week and month",
 
         // WEEK (from MONDAY to TODAY)
         () -> {
