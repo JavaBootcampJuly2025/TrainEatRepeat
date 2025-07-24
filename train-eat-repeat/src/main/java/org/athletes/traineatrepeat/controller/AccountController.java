@@ -18,11 +18,14 @@ public class AccountController {
 
   @GetMapping("/register")
   public String register(Model model) {
-      return accountService.prepareRegistrationForm(model);
+    return accountService.prepareRegistrationForm(model);
   }
 
   @PostMapping("/register")
-  public String register(@ModelAttribute("registerRequest") RegisterRequest registerDto, BindingResult result, Model model) {
+  public String register(
+      @ModelAttribute("registerRequest") RegisterRequest registerDto,
+      BindingResult result,
+      Model model) {
     return accountService.registerUser(registerDto, result, model);
   }
 }

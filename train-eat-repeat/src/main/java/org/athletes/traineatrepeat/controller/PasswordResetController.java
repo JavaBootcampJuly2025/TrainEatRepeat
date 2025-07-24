@@ -15,35 +15,33 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @RequiredArgsConstructor
 public class PasswordResetController {
-    private final PasswordResetService passwordResetService;
+  private final PasswordResetService passwordResetService;
 
-    @GetMapping("/forgot-password")
-    public String showForgotPasswordForm(Model model) {
-        return passwordResetService.prepareForgotPasswordForm(model);
-    }
+  @GetMapping("/forgot-password")
+  public String showForgotPasswordForm(Model model) {
+    return passwordResetService.prepareForgotPasswordForm(model);
+  }
 
-    @PostMapping("/forgot-password")
-    public String requestPasswordReset(
-            @Valid @ModelAttribute("passwordResetRequest") PasswordResetRequest request,
-            BindingResult result,
-            Model model) {
-        return passwordResetService.handlePasswordResetRequest(request, result, model);
-    }
+  @PostMapping("/forgot-password")
+  public String requestPasswordReset(
+      @Valid @ModelAttribute("passwordResetRequest") PasswordResetRequest request,
+      BindingResult result,
+      Model model) {
+    return passwordResetService.handlePasswordResetRequest(request, result, model);
+  }
 
-    @GetMapping("/reset-password")
-    public String showResetPasswordForm(
-            @RequestParam String token,
-            @RequestParam String email,
-            Model model) {
-        return passwordResetService.prepareResetPasswordForm(token, email, model);
-    }
+  @GetMapping("/reset-password")
+  public String showResetPasswordForm(
+      @RequestParam String token, @RequestParam String email, Model model) {
+    return passwordResetService.prepareResetPasswordForm(token, email, model);
+  }
 
-    @PostMapping("/reset-password")
-    public String resetPassword(
-            @Valid @ModelAttribute("passwordResetRequest") PasswordResetRequest request,
-            @RequestParam String token,
-            BindingResult result,
-            Model model) {
-        return passwordResetService.handlePasswordReset(request, token, result, model);
-    }
+  @PostMapping("/reset-password")
+  public String resetPassword(
+      @Valid @ModelAttribute("passwordResetRequest") PasswordResetRequest request,
+      @RequestParam String token,
+      BindingResult result,
+      Model model) {
+    return passwordResetService.handlePasswordReset(request, token, result, model);
+  }
 }

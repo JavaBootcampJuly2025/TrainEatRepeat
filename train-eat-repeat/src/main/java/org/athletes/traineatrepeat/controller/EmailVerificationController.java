@@ -12,15 +12,15 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RequiredArgsConstructor
 public class EmailVerificationController {
 
-    private final AccountService accountService;
+  private final AccountService accountService;
 
-    @GetMapping("/verify-email")
-    public String showVerificationPage(@RequestParam String email, Model model) {
-        return accountService.prepareVerificationPage(email, model);
-    }
+  @GetMapping("/verify-email")
+  public String showVerificationPage(@RequestParam String email, Model model) {
+    return accountService.prepareVerificationPage(email, model);
+  }
 
-    @PostMapping("/verify-email")
-    public String verifyEmail(@RequestParam String email, @RequestParam String code, Model model) {
-        return accountService.verifyEmail(email, code, model);
-    }
+  @PostMapping("/verify-email")
+  public String verifyEmail(@RequestParam String email, @RequestParam String code, Model model) {
+    return accountService.verifyEmail(email, code, model);
+  }
 }

@@ -1,14 +1,14 @@
 package org.athletes.traineatrepeat.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.athletes.traineatrepeat.repository.UserRepository;
-import org.athletes.traineatrepeat.model.response.UserResponse;
 import org.athletes.traineatrepeat.converter.UserConverter;
+import org.athletes.traineatrepeat.model.response.UserResponse;
+import org.athletes.traineatrepeat.repository.UserRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Controller
 @RequiredArgsConstructor
