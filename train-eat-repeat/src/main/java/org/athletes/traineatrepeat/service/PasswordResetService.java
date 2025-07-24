@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.common.ValidationCommon;
+import org.athletes.traineatrepeat.model.PasswordResetResult;
 import org.athletes.traineatrepeat.model.request.PasswordResetRequest;
 import org.athletes.traineatrepeat.repository.UserRepository;
 import org.athletes.traineatrepeat.repository.dto.UserDTO;
@@ -29,16 +30,15 @@ public class PasswordResetService {
   }
 
   public String handlePasswordResetRequest(PasswordResetRequest request, Model model) {
-    try {
-      if (!initiatePasswordReset(request.email())) {
-        model.addAttribute(ERROR_ATTRIBUTE, "No user found with this email address.");
-        return FORGOT_PASSWORD_PAGE;
-      }
-      return "redirect:/forgot-password?success=true";
-    } catch (Exception e) {
-      model.addAttribute(ERROR_ATTRIBUTE, "Failed to send password reset email. Please try again.");
+    PasswordResetResult result = initiatePasswordReset(request.email());
+    if (result != PasswordResetResult.SUCCESS) {
+      String errorMessage = result == PasswordResetResult.USER_NOT_FOUND
+              ? "No user found with this email address."
+              : "Failed to send password reset email. Please try again.";
+      model.addAttribute(ERROR_ATTRIBUTE, errorMessage);
       return FORGOT_PASSWORD_PAGE;
     }
+    return "redirect:/forgot-password?success=true";
   }
 
   public String prepareResetPasswordForm(String token, String email, Model model) {
@@ -68,10 +68,10 @@ public class PasswordResetService {
     return "redirect:/login";
   }
 
-  private boolean initiatePasswordReset(String email) {
+  private PasswordResetResult initiatePasswordReset(String email) {
     UserDTO user = userRepository.findByEmail(email);
     if (user == null || !user.isEmailVerified()) {
-      return false;
+      return PasswordResetResult.USER_NOT_FOUND;
     }
 
     String resetToken = UUID.randomUUID().toString();
@@ -83,11 +83,11 @@ public class PasswordResetService {
 
     try {
       emailService.sendPasswordResetEmail(email, user.getUsername(), resetToken);
+      return PasswordResetResult.SUCCESS;
     } catch (Exception e) {
       invalidateResetToken(user);
-      return false;
+      return PasswordResetResult.EMAIL_FAILED;
     }
-    return true;
   }
 
   private boolean validateResetToken(String email, String token) {
