@@ -6,7 +6,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +25,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -113,20 +115,18 @@ class MealServiceTest {
     assertEquals(0.3f, captured.getFat(), 0.01f);
   }
 
-  @Test
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {"   "})
   @DisplayName("Should throw exception if food name is invalid")
-  void submitMeal_InvalidFoodName_Throws() {
-    List<String> invalidNames = Arrays.asList(null, "", "   ");
+  void submitMeal_InvalidFoodName_Throws(String invalidName) {
+    MealRecordRequest request = new MealRecordRequest(invalidName, 100f, null);
 
-    for (String invalidName : invalidNames) {
-      TrainEatRepeatException exception =
-          assertThrows(
-              TrainEatRepeatException.class,
-              () ->
-                  mealService.submitMeal(
-                      TEST_UUID, new MealRecordRequest(invalidName, 100f, null)));
-      assertEquals("Food name cannot be null or empty", exception.getMessage());
-    }
+    TrainEatRepeatException exception =
+        assertThrows(
+            TrainEatRepeatException.class, () -> mealService.submitMeal(TEST_UUID, request));
+
+    assertEquals("Food name cannot be null or empty", exception.getMessage());
 
     verifyNoInteractions(usdaClient);
     verifyNoInteractions(mealRecordRepository);
@@ -163,12 +163,11 @@ class MealServiceTest {
                     Collections.emptyList())));
     when(usdaClient.searchFood(anyString())).thenReturn(usdaResponseNoNutrients);
 
+    MealRecordRequest request = new MealRecordRequest("FoodWithoutNutrients", 100.0f, null);
+
     TrainEatRepeatException exception =
         assertThrows(
-            TrainEatRepeatException.class,
-            () ->
-                mealService.submitMeal(
-                    TEST_UUID, new MealRecordRequest("FoodWithoutNutrients", 100.0f, null)));
+            TrainEatRepeatException.class, () -> mealService.submitMeal(TEST_UUID, request));
 
     assertEquals(
         "No nutritional information found for: FoodWithoutNutrients", exception.getMessage());
@@ -194,16 +193,14 @@ class MealServiceTest {
     // When timePeriod is WEEK or MONTH, use findMealsByUuidAndDateBetween
     LocalDate startOfWeek = TODAY.with(java.time.DayOfWeek.MONDAY);
     LocalDate endOfWeek = TODAY.with(java.time.DayOfWeek.SUNDAY);
-    when(mealRecordRepository.findMealsByUuidAndDateBetween(
-            eq(TEST_UUID), eq(startOfWeek), eq(endOfWeek)))
+    when(mealRecordRepository.findMealsByUuidAndDateBetween(TEST_UUID, startOfWeek, endOfWeek))
         .thenReturn(meals);
     List<MealRecordResponse> week = mealService.getMealsForUser(TEST_UUID, TimePeriod.WEEK);
     assertEquals(1, week.size());
 
     LocalDate startOfMonth = TODAY.withDayOfMonth(1);
     LocalDate endOfMonth = TODAY.withDayOfMonth(TODAY.lengthOfMonth());
-    when(mealRecordRepository.findMealsByUuidAndDateBetween(
-            eq(TEST_UUID), eq(startOfMonth), eq(endOfMonth)))
+    when(mealRecordRepository.findMealsByUuidAndDateBetween(TEST_UUID, startOfMonth, endOfMonth))
         .thenReturn(meals);
     List<MealRecordResponse> month = mealService.getMealsForUser(TEST_UUID, TimePeriod.MONTH);
     assertEquals(1, month.size());
@@ -314,8 +311,7 @@ class MealServiceTest {
             buildMealDTO(
                 UUID.randomUUID().toString(), "Meal2", 200f, 20f, 10f, 4f, 400f, endOfWeek));
 
-    when(mealRecordRepository.findMealsByUuidAndDateBetween(
-            eq(TEST_UUID), eq(startOfWeek), eq(endOfWeek)))
+    when(mealRecordRepository.findMealsByUuidAndDateBetween(TEST_UUID, startOfWeek, endOfWeek))
         .thenReturn(mealDTOs);
 
     UserNutritionStatisticsResponse stats =
@@ -338,8 +334,7 @@ class MealServiceTest {
     LocalDate startOfWeek = todayInTest.with(java.time.DayOfWeek.MONDAY);
     LocalDate endOfWeek = todayInTest.with(java.time.DayOfWeek.SUNDAY);
 
-    when(mealRecordRepository.findMealsByUuidAndDateBetween(
-            eq(TEST_UUID), eq(startOfWeek), eq(endOfWeek)))
+    when(mealRecordRepository.findMealsByUuidAndDateBetween(TEST_UUID, startOfWeek, endOfWeek))
         .thenReturn(Collections.emptyList());
 
     UserNutritionStatisticsResponse stats =
