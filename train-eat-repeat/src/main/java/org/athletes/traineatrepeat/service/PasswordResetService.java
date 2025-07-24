@@ -10,65 +10,59 @@ import org.athletes.traineatrepeat.repository.dto.UserDTO;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 
 @Service
 @RequiredArgsConstructor
 public class PasswordResetService {
+  public static final String FORGOT_PASSWORD_PAGE = "forgot-password";
+  public static final String ERROR_ATTRIBUTE = "error";
+  public static final String RESET_PASSWORD_PAGE = "reset-password";
+  public static final String TOKEN_ATTRIBUTE = "token";
+  public static final String PASSWORD_RESET_REQUEST_ATTRIBUTE = "passwordResetRequest";
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final EmailService emailService;
 
   public String prepareForgotPasswordForm(Model model) {
-    model.addAttribute("passwordResetRequest", new PasswordResetRequest("", "", ""));
-    return "forgot-password";
+    model.addAttribute(PASSWORD_RESET_REQUEST_ATTRIBUTE, new PasswordResetRequest("", "", ""));
+    return FORGOT_PASSWORD_PAGE;
   }
 
-  public String handlePasswordResetRequest(
-      PasswordResetRequest request, BindingResult result, Model model) {
-    if (result.hasFieldErrors("email")) {
-      return "forgot-password";
-    }
-
+  public String handlePasswordResetRequest(PasswordResetRequest request, Model model) {
     try {
       if (!initiatePasswordReset(request.email())) {
-        model.addAttribute("error", "No user found with this email address.");
-        return "forgot-password";
+        model.addAttribute(ERROR_ATTRIBUTE, "No user found with this email address.");
+        return FORGOT_PASSWORD_PAGE;
       }
       return "redirect:/forgot-password?success=true";
     } catch (Exception e) {
-      model.addAttribute("error", "Failed to send password reset email. Please try again.");
-      return "forgot-password";
+      model.addAttribute(ERROR_ATTRIBUTE, "Failed to send password reset email. Please try again.");
+      return FORGOT_PASSWORD_PAGE;
     }
   }
 
   public String prepareResetPasswordForm(String token, String email, Model model) {
     if (validateResetToken(email, token)) {
-      model.addAttribute("error", "Invalid or expired password reset token.");
-      return "reset-password";
+      model.addAttribute(ERROR_ATTRIBUTE, "Invalid or expired password reset token.");
+      model.addAttribute(PASSWORD_RESET_REQUEST_ATTRIBUTE, new PasswordResetRequest("", "", ""));
+      return FORGOT_PASSWORD_PAGE; // Return a different page on error
     }
-
-    model.addAttribute("passwordResetRequest", new PasswordResetRequest(email, "", ""));
-    model.addAttribute("token", token);
-    return "reset-password";
+    model.addAttribute(PASSWORD_RESET_REQUEST_ATTRIBUTE, new PasswordResetRequest(email, "", ""));
+    model.addAttribute(TOKEN_ATTRIBUTE, token);
+    return RESET_PASSWORD_PAGE;
   }
 
-  public String handlePasswordReset(
-      PasswordResetRequest request, String token, BindingResult result, Model model) {
-    if (result.hasErrors()) {
-      model.addAttribute("token", token);
-      return "reset-password";
-    }
+  public String handlePasswordReset(PasswordResetRequest request, String token, Model model) {
 
     if (!validatePasswords(request.password(), request.confirmPassword(), model)) {
-      model.addAttribute("token", token);
-      return "reset-password";
+      model.addAttribute(TOKEN_ATTRIBUTE, token);
+      return RESET_PASSWORD_PAGE;
     }
 
     if (!performPasswordReset(request.email(), token, request.password())) {
-      model.addAttribute("error", "Invalid or expired password reset token.");
-      model.addAttribute("token", token);
-      return "reset-password";
+      model.addAttribute(ERROR_ATTRIBUTE, "Invalid or expired password reset token.");
+      model.addAttribute(TOKEN_ATTRIBUTE, token);
+      return RESET_PASSWORD_PAGE;
     }
 
     return "redirect:/login";
@@ -110,28 +104,28 @@ public class PasswordResetService {
 
   private boolean validatePasswords(String password, String confirmPassword, Model model) {
     if (password == null || password.trim().isEmpty()) {
-      model.addAttribute("error", "Password is required");
+      model.addAttribute(ERROR_ATTRIBUTE, "Password is required");
       return false;
     }
 
     if (confirmPassword == null || confirmPassword.trim().isEmpty()) {
-      model.addAttribute("error", "Confirm password is required");
+      model.addAttribute(ERROR_ATTRIBUTE, "Confirm password is required");
       return false;
     }
 
     if (!password.equals(confirmPassword)) {
-      model.addAttribute("error", "Passwords do not match");
+      model.addAttribute(ERROR_ATTRIBUTE, "Passwords do not match");
       return false;
     }
 
     if (password.length() < 8) {
-      model.addAttribute("error", "Password must be at least 8 characters long");
+      model.addAttribute(ERROR_ATTRIBUTE, "Password must be at least 8 characters long");
       return false;
     }
 
     if (!password.matches(ValidationCommon.PASSWORD_REGEX)) {
       model.addAttribute(
-          "error",
+          ERROR_ATTRIBUTE,
           "Password must contain at least one uppercase letter, "
               + "one lowercase letter, one number and one special character");
       return false;

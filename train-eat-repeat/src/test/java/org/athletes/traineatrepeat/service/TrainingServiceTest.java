@@ -56,7 +56,7 @@ class TrainingServiceTest {
 
     ExerciseDTO exerciseDto = new ExerciseDTO();
     exerciseDto.setName("Running");
-    exerciseDto.setMET(8.0f);
+    exerciseDto.setMet(8.0f);
 
     savedDto =
         TrainingDTO.builder()
@@ -91,7 +91,7 @@ class TrainingServiceTest {
             new TrainingRecordResponse(
                 trainingId, "Running", 30.0f, savedDto.getCaloriesLost(), today));
 
-    var resp = service.submitTraining(userUuid, req);
+    var resp = service.submitTraining(req);
 
     assertEquals(trainingId, resp.id());
     assertEquals(savedDto.getCaloriesLost(), resp.caloriesLost());
@@ -105,8 +105,7 @@ class TrainingServiceTest {
     when(userRepo.findById(userUuid)).thenReturn(Optional.empty());
     var req = new TrainingRecordRequest(userUuid, "Running", 30f, 0f, today);
 
-    var ex =
-        assertThrows(TrainEatRepeatException.class, () -> service.submitTraining(userUuid, req));
+    var ex = assertThrows(TrainEatRepeatException.class, () -> service.submitTraining(req));
     assertEquals("User not found with UUID: " + userUuid, ex.getMessage());
   }
 
@@ -116,8 +115,7 @@ class TrainingServiceTest {
     when(exerciseRepo.findByNameIgnoreCase("Running")).thenReturn(Optional.empty());
     var req = new TrainingRecordRequest(userUuid, "Running", 30f, 0f, today);
 
-    var ex =
-        assertThrows(TrainEatRepeatException.class, () -> service.submitTraining(userUuid, req));
+    var ex = assertThrows(TrainEatRepeatException.class, () -> service.submitTraining(req));
     assertEquals("Exercise not found: Running", ex.getMessage());
   }
 
@@ -127,7 +125,7 @@ class TrainingServiceTest {
     var req = new TrainingRecordRequest(userUuid, "Jogging", 45f, 0f, today);
     var joggingDto = new ExerciseDTO();
     joggingDto.setName("Jogging");
-    joggingDto.setMET(6f);
+    joggingDto.setMet(6f);
     float expected = calcCalories(6f, 70f, 45f);
 
     when(trainingRepo.findById(trainingId)).thenReturn(Optional.of(savedDto));

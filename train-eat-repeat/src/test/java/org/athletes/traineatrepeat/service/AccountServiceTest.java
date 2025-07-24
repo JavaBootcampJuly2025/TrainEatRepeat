@@ -192,7 +192,7 @@ class AccountServiceTest {
 
   @Test
   @DisplayName("Should save encoded password, verification code, and expiration time")
-  void registerUser_SavesEncodedPasswordAndVerificationDetails() throws Exception {
+  void registerUser_SavesEncodedPasswordAndVerificationDetails() {
     when(userRepository.findByEmail(any())).thenReturn(null);
     when(passwordEncoder.encode(validRegisterRequestFemale.password())).thenReturn("myEncodedPass");
 
@@ -223,8 +223,7 @@ class AccountServiceTest {
     assertEquals("register", viewName);
     verify(userRepository).save(any(UserDTO.class));
     verify(emailService).sendVerificationEmail(anyString(), anyString(), anyString());
-    verify(model)
-        .addAttribute(eq("error"), eq("Failed to send verification email. Please try again."));
+    verify(model).addAttribute("error", "Failed to send verification email. Please try again.");
     verify(model).addAttribute(eq("registerRequest"), any(RegisterRequest.class));
   }
 
