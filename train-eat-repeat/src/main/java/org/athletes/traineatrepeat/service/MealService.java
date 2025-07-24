@@ -33,7 +33,7 @@ public class MealService {
     }
 
     float factor = calculateFactorByWeight(weightInGrams);
-    var nutritionMap = new EnumMap<Nutrients, Float>(Nutrients.class);
+    var nutritionMap = new HashMap<Nutrients, Float>();
 
     if (!CollectionUtils.isEmpty(usdaResponse.foods())) {
       var food = usdaResponse.foods().getFirst();
@@ -192,5 +192,24 @@ public class MealService {
     var startOfMonth = today.withDayOfMonth(1);
     var endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
     return mealRecordRepository.findMealsByUuidAndDateBetween(uuid, startOfMonth, endOfMonth);
+  }
+
+  public Map<String, Double> getWeeklyCalorieChartData(String uuid) {
+    LocalDate today = timeProvider.getCurrentDate();
+    Map<String, Double> weeklyData = new LinkedHashMap<>();
+
+    for (int i = 6; i >= 0; i--) {
+      LocalDate date = today.minusDays(i);
+      List<MealDTO> dailyMeals = mealRecordRepository.findAllByUuidAndDate(uuid, date);
+
+      double dailyCalories = dailyMeals.stream()
+              .mapToDouble(MealDTO::getCalories)
+              .sum();
+
+      String dayName = date.getDayOfWeek().name().substring(0, 3);
+      weeklyData.put(dayName, dailyCalories);
+    }
+
+    return weeklyData;
   }
 }
