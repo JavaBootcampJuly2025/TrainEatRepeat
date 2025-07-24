@@ -1,5 +1,10 @@
 package org.athletes.traineatrepeat.service;
 
+import static org.athletes.traineatrepeat.common.ValidationCommon.EMAIL_REGEX;
+import static org.athletes.traineatrepeat.common.ValidationCommon.PASSWORD_REGEX;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.athletes.traineatrepeat.model.request.RegisterRequest;
@@ -10,12 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import static org.athletes.traineatrepeat.common.ValidationCommon.EMAIL_REGEX;
-import static org.athletes.traineatrepeat.common.ValidationCommon.PASSWORD_REGEX;
 
 @Service
 @RequiredArgsConstructor
@@ -45,13 +44,16 @@ public class AccountService {
       return "register";
     }
 
-    float bmi = registerRequest.weight() / (registerRequest.height() / 100 * registerRequest.height() / 100);
+    float bmi =
+        registerRequest.weight()
+            / (registerRequest.height() / 100 * registerRequest.height() / 100);
     float bmr = calculateBMR(registerRequest);
 
     String verificationCode = UUID.randomUUID().toString();
     LocalDateTime verificationExpiresAt = LocalDateTime.now().plusHours(24);
 
-    UserDTO user = UserDTO.builder()
+    UserDTO user =
+        UserDTO.builder()
             .username(registerRequest.username())
             .email(registerRequest.email())
             .password(passwordEncoder.encode(registerRequest.password()))
@@ -70,7 +72,8 @@ public class AccountService {
     userRepository.save(user);
 
     try {
-      emailService.sendVerificationEmail(registerRequest.email(), registerRequest.username(), verificationCode);
+      emailService.sendVerificationEmail(
+          registerRequest.email(), registerRequest.username(), verificationCode);
       return "redirect:/verify-email?email=" + registerRequest.email();
     } catch (Exception e) {
       model.addAttribute("error", "Failed to send verification email. Please try again.");
@@ -109,9 +112,9 @@ public class AccountService {
     }
 
     if (user.getVerificationCode() != null
-            && user.getVerificationCode().equals(code)
-            && user.getVerificationExpiresAt() != null
-            && LocalDateTime.now().isBefore(user.getVerificationExpiresAt())) {
+        && user.getVerificationCode().equals(code)
+        && user.getVerificationExpiresAt() != null
+        && LocalDateTime.now().isBefore(user.getVerificationExpiresAt())) {
       user.setEmailVerified(true);
       user.setVerificationCode(null);
       user.setVerificationExpiresAt(null);
@@ -128,7 +131,9 @@ public class AccountService {
     if (StringUtils.isEmpty(username)) {
       result.addError(new FieldError("registerRequest", "username", "Username is required"));
     } else if (username.length() < 5 || username.length() > 16) {
-      result.addError(new FieldError("registerRequest", "username", "Username must be between 5 and 16 characters long"));
+      result.addError(
+          new FieldError(
+              "registerRequest", "username", "Username must be between 5 and 16 characters long"));
     }
   }
 
@@ -146,11 +151,19 @@ public class AccountService {
     if (StringUtils.isEmpty(password)) {
       result.addError(new FieldError("registerRequest", "password", "Password is required"));
     } else if (password.length() < 8 || password.length() > 32) {
-      result.addError(new FieldError("registerRequest", "password", "Password must be between 8 and 32 characters long"));
+      result.addError(
+          new FieldError(
+              "registerRequest", "password", "Password must be between 8 and 32 characters long"));
     } else if (!password.matches(PASSWORD_REGEX)) {
-      result.addError(new FieldError("registerRequest", "password", "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character"));
+      result.addError(
+          new FieldError(
+              "registerRequest",
+              "password",
+              "Password must contain at least one lowercase letter, one uppercase letter, one digit, and one special character"));
     } else if (!password.equals(confirmPassword)) {
-      result.addError(new FieldError("registerRequest", "confirmPassword", "Password and Confirm Password do not match"));
+      result.addError(
+          new FieldError(
+              "registerRequest", "confirmPassword", "Password and Confirm Password do not match"));
     }
   }
 
