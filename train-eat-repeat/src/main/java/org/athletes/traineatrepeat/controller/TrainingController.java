@@ -24,8 +24,12 @@ public class TrainingController {
 
   @PostMapping("/submit-training")
   public TrainingRecordResponse submitTraining(
-      @RequestParam @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
-      @Valid @RequestBody TrainingRecordRequest request) {
+      @RequestParam
+          @NotBlank
+          @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+          @Valid
+          @RequestBody
+          TrainingRecordRequest request) {
     return trainingService.submitTraining(request);
   }
 

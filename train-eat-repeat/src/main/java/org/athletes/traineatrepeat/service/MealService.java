@@ -202,9 +202,7 @@ public class MealService {
       LocalDate date = today.minusDays(i);
       List<MealDTO> dailyMeals = mealRecordRepository.findAllByUuidAndDate(uuid, date);
 
-      double dailyCalories = dailyMeals.stream()
-              .mapToDouble(MealDTO::getCalories)
-              .sum();
+      double dailyCalories = dailyMeals.stream().mapToDouble(MealDTO::getCalories).sum();
 
       String dayName = date.getDayOfWeek().name().substring(0, 3);
       weeklyData.put(dayName, dailyCalories);
