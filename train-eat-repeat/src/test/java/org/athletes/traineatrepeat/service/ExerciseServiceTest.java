@@ -41,9 +41,9 @@ class ExerciseServiceTest {
 
   @BeforeEach
   void setUp() {
-    sampleExerciseDTO = ExerciseDTO.builder().id(ID_1).name("Running").MET(7.0f).build();
+    sampleExerciseDTO = ExerciseDTO.builder().id(ID_1).name("Running").met(7.0f).build();
 
-    anotherExerciseDTO = ExerciseDTO.builder().id(ID_2).name("Weightlifting").MET(5.0f).build();
+    anotherExerciseDTO = ExerciseDTO.builder().id(ID_2).name("Weightlifting").met(5.0f).build();
 
     sampleExerciseRequest = new ExerciseRequest("Running", 7.0f);
     sampleExerciseResponse = new ExerciseResponse(ID_1, "Running", 7.0f);
@@ -128,7 +128,7 @@ class ExerciseServiceTest {
 
     ExerciseRequest updateRequest = new ExerciseRequest("Cycling", 8.5f);
 
-    ExerciseDTO updatedDTO = ExerciseDTO.builder().id(id).name("Cycling").MET(8.5f).build();
+    ExerciseDTO updatedDTO = ExerciseDTO.builder().id(id).name("Cycling").met(8.5f).build();
     ExerciseResponse expectedResponse = new ExerciseResponse(id, "Cycling", 8.5f);
 
     when(exerciseRepository.findById(id)).thenReturn(Optional.of(sampleExerciseDTO));
