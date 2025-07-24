@@ -1,79 +1,24 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Email Verification - TrainEatRepeat</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <style>
-    body {
-      background: linear-gradient(to right, #7b2ff7, #4facfe);
-      font-size: 0.9rem;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .form-container {
-      background-color: white;
-      border-radius: 0.85rem;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.08);
-      padding: 1.5rem;
-      width: 100%;
-      max-width: 360px;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-size: 1.4rem;
-    }
-
-    .form-label {
-      font-weight: 500;
-      font-size: 0.9rem;
-    }
-
-    .form-control {
-      padding: 0.4rem 0.65rem;
-      font-size: 0.9rem;
-      border-radius: 0.45rem;
-    }
-
-    .btn {
-      font-size: 0.9rem;
-      padding: 0.5rem;
-      border-radius: 0.45rem;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <title>Email Verification</title>
 </head>
 <body>
-
-<div class="form-container">
-  <h2>Email Verification</h2>
-
-  <p class="text-center">Enter the verification code sent to<br><strong th:text="${email}">your@email.com</strong></p>
-
-  <div th:if="${error}" class="alert alert-danger text-center" role="alert">
-    <span th:text="${error}"></span>
-  </div>
-
+<div>
+  <h1>Email Verification</h1>
+  <p>Please enter the verification code sent to <span th:text="${email}"></span></p>
+  <div th:if="${error}" th:text="${error}" style="color: red;"></div>
   <form th:action="@{/verify-email}" method="post">
     <input type="hidden" name="email" th:value="${email}" />
-
-    <div class="mb-3">
-      <label for="code" class="form-label">Verification Code*</label>
-      <input type="text" id="code" name="code" class="form-control" required />
+    <div>
+      <label for="code">Verification Code*</label>
+      <input type="text" id="code" name="code" />
     </div>
-
-    <div class="d-grid">
-      <button type="submit" class="btn btn-primary">Verify</button>
+    <div>
+      <button type="submit">Verify</button>
     </div>
   </form>
 </div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
