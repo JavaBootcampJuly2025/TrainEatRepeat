@@ -27,7 +27,7 @@ public class TrainingService {
   private final UserRepository userRepository;
   private final TimeProvider timeProvider;
 
-  public TrainingRecordResponse submitTraining(String uuid, TrainingRecordRequest request) {
+  public TrainingRecordResponse submitTraining(TrainingRecordRequest request) {
     var user =
         userRepository
             .findById(request.uuid())
@@ -40,7 +40,7 @@ public class TrainingService {
             .orElseThrow(
                 () -> new TrainEatRepeatException("Exercise not found: " + request.exercise()));
 
-    float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+    float calories = calculateCalories(exercise.getMet(), user.getWeight(), request.duration());
 
     var trainingToSave =
         TrainingDTO.builder()
@@ -76,7 +76,7 @@ public class TrainingService {
             .orElseThrow(
                 () -> new TrainEatRepeatException("Exercise not found: " + request.exercise()));
 
-    float calories = calculateCalories(exercise.getMET(), user.getWeight(), request.duration());
+    float calories = calculateCalories(exercise.getMet(), user.getWeight(), request.duration());
 
     existingTraining.setExercise(request.exercise());
     existingTraining.setDuration(request.duration());
@@ -112,17 +112,7 @@ public class TrainingService {
     if (period != null) {
       LocalDate today = timeProvider.getCurrentDate();
 
-      switch (period) {
-        case WEEK -> {
-          var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
-          daysInPeriod = (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfWeek, today) + 1);
-        }
-        case MONTH -> {
-          var startOfMonth = today.withDayOfMonth(1);
-          daysInPeriod =
-              (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
-        }
-      }
+      daysInPeriod = getDaysInPeriod(period, today);
     }
 
     float avgSessions = trainings.size() / (float) daysInPeriod;
@@ -131,6 +121,22 @@ public class TrainingService {
         .avgCaloriesBurnedPerSession(avgCaloriesBurned)
         .avgPerDaySessions(avgSessions)
         .build();
+  }
+
+  private static int getDaysInPeriod(TimePeriod period, LocalDate today) {
+    switch (period) {
+      case WEEK -> {
+        var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
+        return (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfWeek, today) + 1);
+      }
+      case MONTH -> {
+        var startOfMonth = today.withDayOfMonth(1);
+        return (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
+      }
+      default ->
+          throw new TrainEatRepeatException(
+              "Invalid time period for training statistics: " + period);
+    }
   }
 
   private List<TrainingDTO> getTrainingsFromTimePeriod(String uuid, TimePeriod timePeriod) {

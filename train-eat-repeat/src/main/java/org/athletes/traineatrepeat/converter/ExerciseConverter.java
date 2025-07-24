@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 public class ExerciseConverter {
 
   public ExerciseDTO fromRequestToEntity(ExerciseRequest request) {
-    return ExerciseDTO.builder().name(request.name()).MET(request.met()).build();
+    return ExerciseDTO.builder().name(request.name()).met(request.met()).build();
   }
 
   public ExerciseResponse toResponseFromEntity(ExerciseDTO entity) {
     return ExerciseResponse.builder()
         .id(entity.getId())
         .name(entity.getName())
-        .met(entity.getMET())
+        .met(entity.getMet())
         .build();
   }
 }

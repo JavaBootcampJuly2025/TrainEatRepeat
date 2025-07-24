@@ -15,5 +15,5 @@ public class ExerciseDTO {
   private String id;
 
   private String name;
-  private float MET;
+  private float met;
 }

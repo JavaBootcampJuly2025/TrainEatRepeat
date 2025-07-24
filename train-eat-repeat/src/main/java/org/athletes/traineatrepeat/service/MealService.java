@@ -1,10 +1,7 @@
 package org.athletes.traineatrepeat.service;
 
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import lombok.RequiredArgsConstructor;
 import org.athletes.traineatrepeat.api.UsdaClient;
 import org.athletes.traineatrepeat.converter.MealRecordConverter;
@@ -36,7 +33,7 @@ public class MealService {
     }
 
     float factor = calculateFactorByWeight(weightInGrams);
-    var nutritionMap = new HashMap<Nutrients, Float>();
+    var nutritionMap = new EnumMap<Nutrients, Float>(Nutrients.class);
 
     if (!CollectionUtils.isEmpty(usdaResponse.foods())) {
       var food = usdaResponse.foods().getFirst();

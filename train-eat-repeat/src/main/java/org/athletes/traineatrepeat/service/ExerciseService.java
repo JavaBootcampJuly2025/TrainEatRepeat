@@ -23,7 +23,7 @@ public class ExerciseService {
           "Exercise with name '" + request.name() + "' already exists");
     }
 
-    var exerciseToSave = ExerciseDTO.builder().name(request.name()).MET(request.met()).build();
+    var exerciseToSave = ExerciseDTO.builder().name(request.name()).met(request.met()).build();
     var savedExercise = exerciseRepository.save(exerciseToSave);
     return exerciseConverter.toResponseFromEntity(savedExercise);
   }
@@ -52,7 +52,7 @@ public class ExerciseService {
     }
 
     existingExercise.setName(request.name());
-    existingExercise.setMET(request.met());
+    existingExercise.setMet(request.met());
 
     var updatedExercise = exerciseRepository.save(existingExercise);
     return exerciseConverter.toResponseFromEntity(updatedExercise);

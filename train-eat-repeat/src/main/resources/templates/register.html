@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="utf-8">
@@ -66,44 +66,43 @@
 <div class="form-container">
   <h2>Sign up</h2>
 
+  <div th:if="${error}" class="alert alert-danger text-center" role="alert">
+    <span th:text="${error}"></span>
+  </div>
+
+  <!--/*@thymesVar id="registerRequest" type="org.athletes.traineatrepeat.model.request.RegisterRequest"*/-->
   <form method="post" th:object="${registerRequest}">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-<div class="container py-5">
-  <div class="row">
-    <div class="col-lg-6 mx-auto rounded border p-4">
-      <h2 class="text-center mb-4">Register</h2>
-      <hr />
-      <div th:if="${error}" class="alert alert-danger text-center" role="alert">
-        <span th:text="${error}"></span>
-      </div>
-      <!--/*@thymesVar id="registerRequest" type="org.athletes.traineatrepeat.model.request.RegisterRequest"*/-->
-      <form method="post" th:object="${registerRequest}">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
     <div class="form-group">
       <label class="form-label">Username*</label>
       <input class="form-control" th:field="*{username}" required />
+      <div th:if="${#fields.hasErrors('username')}" class="text-danger small" th:errors="*{username}"></div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Email*</label>
       <input type="email" class="form-control" th:field="*{email}" required />
+      <div th:if="${#fields.hasErrors('email')}" class="text-danger small" th:errors="*{email}"></div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Password*</label>
       <input type="password" class="form-control" th:field="*{password}" required />
+      <div th:if="${#fields.hasErrors('password')}" class="text-danger small" th:errors="*{password}"></div>
     </div>
 
     <div class="form-group">
       <label class="form-label">Confirm Password*</label>
       <input type="password" class="form-control" th:field="*{confirmPassword}" required />
+      <div th:if="${#fields.hasErrors('confirmPassword')}" class="text-danger small" th:errors="*{confirmPassword}"></div>
     </div>
 
     <div class="row g-2">
       <div class="col">
         <label class="form-label">Age*</label>
         <input type="number" class="form-control" th:field="*{age}" required />
+        <div th:if="${#fields.hasErrors('age')}" class="text-danger small" th:errors="*{age}"></div>
       </div>
       <div class="col">
         <label class="form-label">Gender*</label>
@@ -112,6 +111,7 @@
           <option value="MALE">Male</option>
           <option value="FEMALE">Female</option>
         </select>
+        <div th:if="${#fields.hasErrors('gender')}" class="text-danger small" th:errors="*{gender}"></div>
       </div>
     </div>
 
@@ -119,10 +119,12 @@
       <div class="col">
         <label class="form-label">Weight (kg)*</label>
         <input type="number" step="0.1" class="form-control" th:field="*{weight}" required />
+        <div th:if="${#fields.hasErrors('weight')}" class="text-danger small" th:errors="*{weight}"></div>
       </div>
       <div class="col">
         <label class="form-label">Height (cm)*</label>
         <input type="number" step="0.1" class="form-control" th:field="*{height}" required />
+        <div th:if="${#fields.hasErrors('height')}" class="text-danger small" th:errors="*{height}"></div>
       </div>
     </div>
 
