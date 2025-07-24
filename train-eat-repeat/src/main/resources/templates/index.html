@@ -2,84 +2,1046 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Dashboard | TrainEatRepeat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- AdminLTE CSS -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css">
+  <meta name="_csrf" th:content="${_csrf.token}"/>
+  <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+  <title>Dashboard | TrainEatRepeat</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8'
+            },
+            success: {
+              50: '#f0fdf4',
+              500: '#22c55e',
+              600: '#16a34a'
+            },
+            warning: {
+              50: '#fffbeb',
+              500: '#f59e0b',
+              600: '#d97706'
+            },
+            danger: {
+              50: '#fef2f2',
+              500: '#ef4444',
+              600: '#dc2626'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          animation: {
+            'bounce-slow': 'bounce 3s infinite',
+            'pulse-slow': 'pulse 4s infinite',
+            'fade-in': 'fadeIn 0.5s ease-in-out',
+            'slide-up': 'slideUp 0.5s ease-out',
+            'scale-in': 'scaleIn 0.3s ease-out'
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' }
+            },
+            slideUp: {
+              '0%': { transform: 'translateY(20px)', opacity: '0' },
+              '100%': { transform: 'translateY(0)', opacity: '1' }
+            },
+            scaleIn: {
+              '0%': { transform: 'scale(0.95)', opacity: '0' },
+              '100%': { transform: 'scale(1)', opacity: '1' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
   <style>
-    .small-box .icon svg {
-      font-size: 3rem !important;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .gradient-success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    .gradient-warning {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+
+    .gradient-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .card-hover {
+      transition: all 0.3s ease;
+    }
+
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .progress-ring {
+      transform: rotate(-90deg);
+      transition: stroke-dasharray 0.5s ease-in-out;
+    }
+
+    .stat-card {
+      background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    }
+
+    .hero-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .glass-effect {
+      backdrop-filter: blur(10px);
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .streak-fire {
+      animation: pulse 2s infinite;
+      filter: drop-shadow(0 0 10px #f59e0b);
+    }
+
+    .notification-dot {
+      animation: pulse 2s infinite;
     }
   </style>
 </head>
-<body class="hold-transition sidebar-mini">
-<div class="wrapper">
-  <!-- Navbar -->
-  <div th:replace="fragments/navbar :: navbar"></div>
-  <!-- Sidebar -->
-  <div th:replace="fragments/sidebar :: sidebar"></div>
-  <!-- Content Wrapper -->
-  <div class="content-wrapper">
-    <section class="content pt-4">
-      <div class="container-fluid">
-        <div class="row">
-          <!-- User Info Cards -->
-          <div class="col-md-3">
-            <div class="small-box bg-success">
-              <div class="inner">
-                <h3 th:text="${user.weight}">0</h3>
-                <p>Weight (kg)</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-weight"></i>
-              </div>
+
+<body class="bg-gray-50 font-sans">
+<!-- Modern Navigation -->
+<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <!-- Logo/Brand -->
+      <div class="flex items-center space-x-4">
+        <div class="flex-shrink-0">
+          <h1 class="text-2xl font-bold text-gray-900">
+            <span class="text-primary-600">Train</span><span class="text-success-600">Eat</span><span class="text-warning-600">Repeat</span>
+          </h1>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <div class="hidden md:flex items-center space-x-8">
+        <a href="/" class="text-primary-600 bg-primary-50 px-3 py-2 rounded-md text-sm font-medium">
+          <i data-lucide="home" class="w-4 h-4 inline mr-2"></i>Dashboard
+        </a>
+        <a href="/meals" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+          <i data-lucide="utensils" class="w-4 h-4 inline mr-2"></i>Meals
+        </a>
+        <a href="/training" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+          <i data-lucide="dumbbell" class="w-4 h-4 inline mr-2"></i>Training
+        </a>
+      </div>
+
+      <!-- User Menu -->
+      <div class="flex items-center space-x-4">
+        <!-- Notifications -->
+        <div class="relative">
+          <button class="p-2 text-gray-600 hover:text-gray-900 rounded-lg transition-colors">
+            <i data-lucide="bell" class="w-5 h-5"></i>
+            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full notification-dot"></span>
+          </button>
+        </div>
+
+        <div class="text-sm text-gray-600" th:if="${user}">
+          Welcome back, <span class="font-medium text-gray-900" th:text="${user.username}">User</span>
+        </div>
+        <form th:action="@{/logout}" method="post" class="inline">
+          <button type="submit" class="text-gray-600 hover:text-gray-900 p-2 rounded-md transition-colors">
+            <i data-lucide="log-out" class="w-4 h-4"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Hero Section -->
+  <div class="hero-card rounded-2xl p-8 mb-8 text-white relative overflow-hidden">
+    <div class="absolute inset-0 bg-black opacity-10"></div>
+    <div class="relative z-10">
+      <div class="flex flex-col md:flex-row items-center justify-between">
+        <div class="mb-6 md:mb-0">
+          <h1 class="text-3xl md:text-4xl font-bold mb-2">
+            Good <span id="time-greeting">morning</span>, <span th:text="${user.username}">User</span>! 👋
+          </h1>
+          <p class="text-xl opacity-90 mb-4">Ready to crush your fitness goals today?</p>
+          <div class="flex items-center space-x-4">
+            <div class="flex items-center bg-white bg-opacity-20 rounded-lg px-3 py-2">
+              <i data-lucide="flame" class="w-5 h-5 mr-2 streak-fire"></i>
+              <span class="font-semibold">7 Day Streak!</span>
             </div>
-          </div>
-          <div class="col-md-3">
-            <div class="small-box bg-warning">
-              <div class="inner">
-                <h3 th:text="${user.height}">0</h3>
-                <p>Height (cm)</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-ruler-vertical"></i>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-3">
-            <div class="small-box bg-danger">
-              <div class="inner">
-                <h3 th:text="${user.BMI}">0</h3>
-                <p>BMI</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-heartbeat"></i>
-              </div>
-            </div>
-          </div>
-          <!-- BMR Card -->
-          <div class="col-md-3">
-            <div class="small-box bg-primary">
-              <div class="inner">
-                <h3 th:text="${user.BMR}">0</h3>
-                <p>BMR</p>
-              </div>
-              <div class="icon">
-                <i class="fas fa-fire"></i>
-              </div>
+            <div class="flex items-center bg-white bg-opacity-20 rounded-lg px-3 py-2">
+              <i data-lucide="trophy" class="w-5 h-5 mr-2 text-yellow-300"></i>
+              <span class="font-semibold">Goal Achiever</span>
             </div>
           </div>
         </div>
-        <!-- Charts and other content can be added here -->
+
+        <!-- Daily Goal Progress Ring -->
+        <div class="flex flex-col items-center">
+          <div class="relative w-32 h-32 mb-4">
+            <svg class="w-32 h-32" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="54" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="8"/>
+              <circle cx="60" cy="60" r="54" fill="none" stroke="white" stroke-width="8"
+                      stroke-linecap="round" class="progress-ring"
+                      id="calorie-progress-ring"
+                      stroke-dasharray="0 339.292" />
+            </svg>
+            <div class="absolute inset-0 flex flex-col items-center justify-center">
+              <span class="text-2xl font-bold" id="calorie-percentage">0%</span>
+              <span class="text-sm opacity-75">Daily Goal</span>
+            </div>
+          </div>
+          <div class="text-center">
+            <p class="text-sm opacity-75">Calories</p>
+            <p class="font-semibold"><span id="consumed-calories">0</span> / <span id="goal-calories">2000</span></p>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <button onclick="quickAddMeal()" class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all card-hover group">
+      <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <i data-lucide="plus" class="w-6 h-6 text-white"></i>
+      </div>
+      <h3 class="font-semibold text-gray-900 mb-1">Add Meal</h3>
+      <p class="text-sm text-gray-600">Log your nutrition</p>
+    </button>
+
+    <button onclick="quickAddWorkout()" class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all card-hover group">
+      <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <i data-lucide="dumbbell" class="w-6 h-6 text-white"></i>
+      </div>
+      <h3 class="font-semibold text-gray-900 mb-1">Log Workout</h3>
+      <p class="text-sm text-gray-600">Track your training</p>
+    </button>
+
+    <button onclick="viewProgress()" class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all card-hover group">
+      <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+      </div>
+      <h3 class="font-semibold text-gray-900 mb-1">View Progress</h3>
+      <p class="text-sm text-gray-600">Check your stats</p>
+    </button>
+
+    <button onclick="setGoals()" class="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-all card-hover group">
+      <div class="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+        <i data-lucide="target" class="w-6 h-6 text-white"></i>
+      </div>
+      <h3 class="font-semibold text-gray-900 mb-1">Set Goals</h3>
+      <p class="text-sm text-gray-600">Plan your journey</p>
+    </button>
+  </div>
+
+  <!-- Today's Overview -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <!-- Today's Macros -->
+    <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Today's Nutrition</h3>
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-500">Updated just now</span>
+          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+        <!-- Protein -->
+        <div class="text-center">
+          <div class="relative w-20 h-20 mx-auto mb-3">
+            <svg class="w-20 h-20" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="36" fill="none" stroke="#e5e7eb" stroke-width="6"/>
+              <circle cx="40" cy="40" r="36" fill="none" stroke="#3b82f6" stroke-width="6"
+                      stroke-linecap="round" class="progress-ring"
+                      id="protein-ring" stroke-dasharray="0 226.194" />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-sm font-bold" id="protein-percentage">0%</span>
+            </div>
+          </div>
+          <h4 class="font-semibold text-gray-900">Protein</h4>
+          <p class="text-sm text-gray-600"><span id="protein-consumed">0</span>g / <span id="protein-goal">120</span>g</p>
+        </div>
+
+        <!-- Carbs -->
+        <div class="text-center">
+          <div class="relative w-20 h-20 mx-auto mb-3">
+            <svg class="w-20 h-20" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="36" fill="none" stroke="#e5e7eb" stroke-width="6"/>
+              <circle cx="40" cy="40" r="36" fill="none" stroke="#f59e0b" stroke-width="6"
+                      stroke-linecap="round" class="progress-ring"
+                      id="carbs-ring" stroke-dasharray="0 226.194" />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-sm font-bold" id="carbs-percentage">0%</span>
+            </div>
+          </div>
+          <h4 class="font-semibold text-gray-900">Carbs</h4>
+          <p class="text-sm text-gray-600"><span id="carbs-consumed">0</span>g / <span id="carbs-goal">200</span>g</p>
+        </div>
+
+        <!-- Fat -->
+        <div class="text-center">
+          <div class="relative w-20 h-20 mx-auto mb-3">
+            <svg class="w-20 h-20" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="36" fill="none" stroke="#e5e7eb" stroke-width="6"/>
+              <circle cx="40" cy="40" r="36" fill="none" stroke="#ef4444" stroke-width="6"
+                      stroke-linecap="round" class="progress-ring"
+                      id="fat-ring" stroke-dasharray="0 226.194" />
+            </svg>
+            <div class="absolute inset-0 flex items-center justify-center">
+              <span class="text-sm font-bold" id="fat-percentage">0%</span>
+            </div>
+          </div>
+          <h4 class="font-semibold text-gray-900">Fat</h4>
+          <p class="text-sm text-gray-600"><span id="fat-consumed">0</span>g / <span id="fat-goal">67</span>g</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="space-y-4">
+      <!-- BMI Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600 font-medium">Body Mass Index</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1" th:text="${user.BMI}">23.1</p>
+            <p class="text-xs text-green-600 mt-1">Normal range</p>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+            <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weight Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-600 font-medium">Current Weight</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1" th:text="${user.weight}">75</p>
+            <p class="text-xs text-blue-600 mt-1">-2kg this month</p>
+          </div>
+          <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+            <i data-lucide="scale" class="w-6 h-6 text-white"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity & Analytics -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Recent Activity</h3>
+        <button class="text-primary-600 hover:text-primary-700 text-sm font-medium">View All</button>
+      </div>
+
+      <div class="space-y-4" id="recent-activity">
+        <!-- Loading state -->
+        <div class="animate-pulse space-y-4">
+          <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 bg-gray-200 rounded-lg"></div>
+            <div class="flex-1">
+              <div class="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div class="h-3 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Weekly Trends -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Weekly Trends</h3>
+        <div class="flex space-x-2">
+          <button class="px-3 py-1 text-sm bg-primary-100 text-primary-700 rounded-lg">Calories</button>
+          <button class="px-3 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded-lg">Workouts</button>
+        </div>
+      </div>
+      <div class="h-48">
+        <canvas id="trendsChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics Grid -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Weekly Calories -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-lg flex items-center justify-center">
+          <i data-lucide="flame" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="text-green-600 text-sm font-medium">+12%</span>
+      </div>
+      <h4 class="text-sm text-gray-600 font-medium">Avg Daily Calories</h4>
+      <p class="text-2xl font-bold text-gray-900 mt-1" id="avg-weekly-calories">1,847</p>
+      <p class="text-xs text-gray-500 mt-1">This week</p>
+    </div>
+
+    <!-- Workout Consistency -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+          <i data-lucide="dumbbell" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="text-green-600 text-sm font-medium">+8%</span>
+      </div>
+      <h4 class="text-sm text-gray-600 font-medium">Workout Days</h4>
+      <p class="text-2xl font-bold text-gray-900 mt-1" id="workout-days">5/7</p>
+      <p class="text-xs text-gray-500 mt-1">This week</p>
+    </div>
+
+    <!-- Protein Goal -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center">
+          <i data-lucide="beef" class="w-5 h-5 text-white"></i>
+        </div>
+        <span class="text-green-600 text-sm font-medium">95%</span>
+      </div>
+      <h4 class="text-sm text-gray-600 font-medium">Protein Goals Met</h4>
+      <p class="text-2xl font-bold text-gray-900 mt-1" id="protein-goals">6/7</p>
+      <p class="text-xs text-gray-500 mt-1">This week</p>
+    </div>
+
+    <!-- Streak -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between mb-4">
+        <div class="w-10 h-10 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center">
+          <i data-lucide="flame" class="w-5 h-5 text-white streak-fire"></i>
+        </div>
+        <span class="text-orange-600 text-sm font-medium">🔥</span>
+      </div>
+      <h4 class="text-sm text-gray-600 font-medium">Current Streak</h4>
+      <p class="text-2xl font-bold text-gray-900 mt-1" id="current-streak">7</p>
+      <p class="text-xs text-gray-500 mt-1">Days</p>
+    </div>
+  </div>
+
+  <!-- Insights & Recommendations -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-lg font-semibold text-gray-900">Insights & Recommendations</h3>
+      <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+        <i data-lucide="lightbulb" class="w-4 h-4 text-gray-600"></i>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i data-lucide="trending-up" class="w-4 h-4 text-blue-600"></i>
+          </div>
+          <div>
+            <h4 class="font-medium text-blue-900 mb-1">Great Progress!</h4>
+            <p class="text-sm text-blue-700">You've been consistent with your nutrition tracking. Keep it up!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i data-lucide="target" class="w-4 h-4 text-green-600"></i>
+          </div>
+          <div>
+            <h4 class="font-medium text-green-900 mb-1">Protein Goal</h4>
+            <p class="text-sm text-green-700">Add 20g more protein to reach your daily target of 120g.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-orange-50 rounded-lg border border-orange-200">
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i data-lucide="clock" class="w-4 h-4 text-orange-600"></i>
+          </div>
+          <div>
+            <h4 class="font-medium text-orange-900 mb-1">Workout Reminder</h4>
+            <p class="text-sm text-orange-700">It's been 2 days since your last workout. Time to get moving!</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 bg-purple-50 rounded-lg border border-purple-200">
+        <div class="flex items-start space-x-3">
+          <div class="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+            <i data-lucide="award" class="w-4 h-4 text-purple-600"></i>
+          </div>
+          <div>
+            <h4 class="font-medium text-purple-900 mb-1">Achievement Unlocked!</h4>
+            <p class="text-sm text-purple-700">You've logged meals for 7 days straight. Amazing consistency!</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
-<!-- AdminLTE JS -->
-<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
-<!-- FontAwesome -->
-<script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/js/all.min.js"></script>
+
+<!-- Quick Add Modals -->
+<!-- Quick Add Meal Modal -->
+<div id="quickAddMealModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 animate-scale-in">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Quick Add Meal</h3>
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeQuickAddMeal()">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="quick-meal-form" class="space-y-4">
+        <div>
+          <label for="quick-food-name" class="block text-sm font-medium text-gray-700 mb-2">Food Name</label>
+          <input type="text"
+                 id="quick-food-name"
+                 name="foodName"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                 placeholder="e.g., chicken breast, apple">
+        </div>
+
+        <div>
+          <label for="quick-weight" class="block text-sm font-medium text-gray-700 mb-2">Weight (grams)</label>
+          <input type="number"
+                 id="quick-weight"
+                 name="weightInGrams"
+                 step="0.1"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                 placeholder="100">
+        </div>
+      </form>
+
+      <div class="flex justify-end space-x-3 mt-6">
+        <button type="button"
+                onclick="closeQuickAddMeal()"
+                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+          Cancel
+        </button>
+        <button type="button"
+                onclick="submitQuickMeal()"
+                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          Add Meal
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Goal Setting Modal -->
+<div id="goalSettingModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 animate-scale-in">
+      <div class="flex items-center justify-between mb-6">
+        <h3 class="text-lg font-semibold text-gray-900">Set Your Goals</h3>
+        <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeGoalSetting()">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <div class="space-y-6">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Daily Calorie Goal</label>
+          <input type="number"
+                 id="calorie-goal-input"
+                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                 placeholder="2000">
+        </div>
+
+        <div class="grid grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Protein (g)</label>
+            <input type="number"
+                   id="protein-goal-input"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                   placeholder="120">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Carbs (g)</label>
+            <input type="number"
+                   id="carbs-goal-input"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                   placeholder="200">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Fat (g)</label>
+            <input type="number"
+                   id="fat-goal-input"
+                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                   placeholder="67">
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3 mt-6">
+        <button type="button"
+                onclick="closeGoalSetting()"
+                class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+          Cancel
+        </button>
+        <button type="button"
+                onclick="saveGoals()"
+                class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          Save Goals
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const userUuid = /*[[${user.uuid}]]*/ '';
+  const user = /*[[${user}]]*/ {};
+  let trendsChart;
+
+  // Configuration
+  const config = {
+    endpoints: {
+      submitMeal: `/meal/submit-food?uuid=${userUuid}`,
+      nutritionStats: `/user/meal-statistics?uuid=${userUuid}`,
+      mealsHistory: `/meal/meals?uuid=${userUuid}`,
+      trainingHistory: `/training/trainings?uuid=${userUuid}`,
+      trainingStats: `/user/training-statistics?uuid=${userUuid}`
+    },
+    goals: {
+      calories: 2000,
+      protein: 120,
+      carbs: 200,
+      fat: 67
+    }
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    if (!userUuid) {
+      console.error('User UUID not found');
+      return;
+    }
+
+    initializeDashboard();
+  });
+
+  async function initializeDashboard() {
+    setTimeGreeting();
+    await loadTodayStats();
+    await loadRecentActivity();
+    await loadWeeklyStats();
+    initializeTrendsChart();
+    loadGoalsFromStorage();
+  }
+
+  function setTimeGreeting() {
+    const hour = new Date().getHours();
+    let greeting = 'morning';
+
+    if (hour >= 12 && hour < 17) {
+      greeting = 'afternoon';
+    } else if (hour >= 17) {
+      greeting = 'evening';
+    }
+
+    document.getElementById('time-greeting').textContent = greeting;
+  }
+
+  async function loadTodayStats() {
+    try {
+      // Load today's nutrition stats
+      const nutritionResponse = await fetch(`${config.endpoints.nutritionStats}&period=DAY`);
+      if (nutritionResponse.ok) {
+        const nutritionData = await nutritionResponse.json();
+        updateTodayNutrition(nutritionData);
+      }
+    } catch (error) {
+      console.error('Error loading today stats:', error);
+    }
+  }
+
+  function updateTodayNutrition(data) {
+    const calories = data.avgCalories || 0;
+    const protein = data.avgProtein || 0;
+    const carbs = data.avgCarbs || 0;
+    const fat = data.avgFat || 0;
+
+    // Update calorie progress ring
+    const caloriePercentage = Math.min((calories / config.goals.calories) * 100, 100);
+    updateProgressRing('calorie-progress-ring', caloriePercentage, 339.292);
+    document.getElementById('calorie-percentage').textContent = `${Math.round(caloriePercentage)}%`;
+    document.getElementById('consumed-calories').textContent = Math.round(calories);
+    document.getElementById('goal-calories').textContent = config.goals.calories;
+
+    // Update macro rings
+    updateMacroRing('protein', protein, config.goals.protein);
+    updateMacroRing('carbs', carbs, config.goals.carbs);
+    updateMacroRing('fat', fat, config.goals.fat);
+  }
+
+  function updateProgressRing(ringId, percentage, circumference) {
+    const ring = document.getElementById(ringId);
+    const offset = circumference - (percentage / 100) * circumference;
+    ring.style.strokeDasharray = `${circumference - offset} ${circumference}`;
+  }
+
+  function updateMacroRing(macro, consumed, goal) {
+    const percentage = Math.min((consumed / goal) * 100, 100);
+    const circumference = 226.194; // 2 * π * 36
+
+    updateProgressRing(`${macro}-ring`, percentage, circumference);
+    document.getElementById(`${macro}-percentage`).textContent = `${Math.round(percentage)}%`;
+    document.getElementById(`${macro}-consumed`).textContent = Math.round(consumed);
+    document.getElementById(`${macro}-goal`).textContent = goal;
+  }
+
+  async function loadRecentActivity() {
+    try {
+      const [mealsResponse, trainingsResponse] = await Promise.all([
+        fetch(`${config.endpoints.mealsHistory}&timePeriod=DAY`),
+        fetch(`${config.endpoints.trainingHistory}&timePeriod=DAY`)
+      ]);
+
+      const meals = mealsResponse.ok ? await mealsResponse.json() : [];
+      const trainings = trainingsResponse.ok ? await trainingsResponse.json() : [];
+
+      displayRecentActivity(meals, trainings);
+    } catch (error) {
+      console.error('Error loading recent activity:', error);
+      document.getElementById('recent-activity').innerHTML =
+              '<p class="text-gray-500 text-center py-4">Unable to load recent activity</p>';
+    }
+  }
+
+  function displayRecentActivity(meals, trainings) {
+    const container = document.getElementById('recent-activity');
+    const activities = [];
+
+    // Add meals to activities
+    meals.slice(0, 3).forEach(meal => {
+      activities.push({
+        type: 'meal',
+        icon: 'utensils',
+        iconColor: 'from-green-400 to-green-600',
+        title: `Added ${meal.foodName}`,
+        subtitle: `${Math.round(meal.calories)} calories`,
+        time: meal.date
+      });
+    });
+
+    // Add trainings to activities
+    trainings.slice(0, 2).forEach(training => {
+      activities.push({
+        type: 'training',
+        icon: 'dumbbell',
+        iconColor: 'from-blue-400 to-blue-600',
+        title: `Completed ${training.exercise}`,
+        subtitle: `${training.duration} min • ${Math.round(training.caloriesLost)} cal burned`,
+        time: training.date
+      });
+    });
+
+    if (activities.length === 0) {
+      container.innerHTML = `
+                    <div class="text-center py-8">
+                        <i data-lucide="calendar" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+                        <p class="text-gray-500">No activity today yet</p>
+                        <p class="text-sm text-gray-400">Start by logging a meal or workout!</p>
+                    </div>
+                `;
+      lucide.createIcons();
+      return;
+    }
+
+    container.innerHTML = activities.map(activity => `
+                <div class="flex items-center space-x-3 animate-fade-in">
+                    <div class="w-10 h-10 bg-gradient-to-br ${activity.iconColor} rounded-lg flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="${activity.icon}" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-medium text-gray-900 truncate">${activity.title}</p>
+                        <p class="text-sm text-gray-500">${activity.subtitle}</p>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        ${formatTime(activity.time)}
+                    </div>
+                </div>
+            `).join('');
+
+    lucide.createIcons();
+  }
+
+  async function loadWeeklyStats() {
+    try {
+      const [nutritionResponse, trainingResponse] = await Promise.all([
+        fetch(`${config.endpoints.nutritionStats}&period=WEEK`),
+        fetch(`${config.endpoints.trainingStats}&period=WEEK`)
+      ]);
+
+      if (nutritionResponse.ok) {
+        const nutritionData = await nutritionResponse.json();
+        document.getElementById('avg-weekly-calories').textContent = Math.round(nutritionData.avgCalories || 0);
+      }
+
+      if (trainingResponse.ok) {
+        const trainingData = await trainingResponse.json();
+        const avgSessions = trainingData.avgPerDaySessions || 0;
+        const workoutDays = Math.round(avgSessions * 7);
+        document.getElementById('workout-days').textContent = `${workoutDays}/7`;
+      }
+    } catch (error) {
+      console.error('Error loading weekly stats:', error);
+    }
+  }
+
+  function initializeTrendsChart() {
+    const weeklyData = /*[[${weeklyCalorieData}]]*/ null || {};
+    const ctx = document.getElementById('trendsChart');
+
+    trendsChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: Object.keys(weeklyData).length ? Object.keys(weeklyData) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        datasets: [{
+          label: 'Daily Calories',
+          data: Object.keys(weeklyData).length ? Object.values(weeklyData) : [0, 0, 0, 0, 0, 0, 0],
+          borderColor: '#3b82f6',
+          backgroundColor: 'rgba(59, 130, 246, 0.1)',
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointBackgroundColor: '#3b82f6',
+          pointBorderColor: '#ffffff',
+          pointBorderWidth: 2,
+          pointRadius: 6,
+          pointHoverRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: false
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            grid: {
+              color: '#f3f4f6'
+            },
+            ticks: {
+              font: {
+                family: 'Inter'
+              }
+            }
+          },
+          x: {
+            grid: {
+              display: false
+            },
+            ticks: {
+              font: {
+                family: 'Inter'
+              }
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        }
+      }
+    });
+  }
+
+  // Quick Actions
+  function quickAddMeal() {
+    document.getElementById('quickAddMealModal').classList.remove('hidden');
+  }
+
+  function closeQuickAddMeal() {
+    document.getElementById('quickAddMealModal').classList.add('hidden');
+    document.getElementById('quick-meal-form').reset();
+  }
+
+  async function submitQuickMeal() {
+    const foodName = document.getElementById('quick-food-name').value.trim();
+    const weight = parseFloat(document.getElementById('quick-weight').value);
+
+    if (!foodName || !weight || weight <= 0) {
+      showAlert('Please fill in all fields correctly', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(config.endpoints.submitMeal, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': getCsrfToken()
+        },
+        body: JSON.stringify({
+          foodName,
+          weightInGrams: weight,
+          date: null
+        })
+      });
+
+      if (!response.ok) throw new Error('Failed to add meal');
+
+      showAlert('Meal added successfully!', 'success');
+      closeQuickAddMeal();
+      await loadTodayStats();
+      await loadRecentActivity();
+
+    } catch (error) {
+      console.error('Error adding meal:', error);
+      showAlert('Error adding meal. Please try again.', 'error');
+    }
+  }
+
+  function quickAddWorkout() {
+    window.location.href = '/training';
+  }
+
+  function viewProgress() {
+    window.location.href = '/meals';
+  }
+
+  function setGoals() {
+    // Load current goals
+    document.getElementById('calorie-goal-input').value = config.goals.calories;
+    document.getElementById('protein-goal-input').value = config.goals.protein;
+    document.getElementById('carbs-goal-input').value = config.goals.carbs;
+    document.getElementById('fat-goal-input').value = config.goals.fat;
+
+    document.getElementById('goalSettingModal').classList.remove('hidden');
+  }
+
+  function closeGoalSetting() {
+    document.getElementById('goalSettingModal').classList.add('hidden');
+  }
+
+  function saveGoals() {
+    const calories = parseInt(document.getElementById('calorie-goal-input').value);
+    const protein = parseInt(document.getElementById('protein-goal-input').value);
+    const carbs = parseInt(document.getElementById('carbs-goal-input').value);
+    const fat = parseInt(document.getElementById('fat-goal-input').value);
+
+    if (!calories || !protein || !carbs || !fat) {
+      showAlert('Please fill in all goal fields', 'error');
+      return;
+    }
+
+    config.goals = { calories, protein, carbs, fat };
+
+    // Save to localStorage
+    localStorage.setItem('userGoals', JSON.stringify(config.goals));
+
+    showAlert('Goals updated successfully!', 'success');
+    closeGoalSetting();
+
+    // Refresh today's stats with new goals
+    loadTodayStats();
+  }
+
+  function loadGoalsFromStorage() {
+    const savedGoals = localStorage.getItem('userGoals');
+    if (savedGoals) {
+      config.goals = { ...config.goals, ...JSON.parse(savedGoals) };
+    }
+  }
+
+  // Utility Functions
+  function formatTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return date.toLocaleDateString();
+  }
+
+  function showAlert(message, type) {
+    // Create alert element
+    const alertElement = document.createElement('div');
+    alertElement.className = `fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg border-l-4 animate-slide-up ${
+            type === 'success'
+                    ? 'bg-green-50 border-green-400 text-green-700'
+                    : 'bg-red-50 border-red-400 text-red-700'
+    }`;
+
+    alertElement.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i data-lucide="${type === 'success' ? 'check-circle' : 'alert-circle'}" class="w-5 h-5 mr-3"></i>
+                        <span class="font-medium">${message}</span>
+                    </div>
+                    <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600 ml-4">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            `;
+
+    document.body.appendChild(alertElement);
+    lucide.createIcons();
+
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      if (alertElement.parentNode) {
+        alertElement.remove();
+      }
+    }, 5000);
+  }
+
+  function getCsrfToken() {
+    const tokenElement = document.querySelector('meta[name="_csrf"]');
+    return tokenElement ? tokenElement.getAttribute('content') : '';
+  }
+
+  // Close modals when clicking outside
+  document.getElementById('quickAddMealModal').addEventListener('click', function(e) {
+    if (e.target === this) closeQuickAddMeal();
+  });
+
+  document.getElementById('goalSettingModal').addEventListener('click', function(e) {
+    if (e.target === this) closeGoalSetting();
+  });
+</script>
 </body>
 </html>
