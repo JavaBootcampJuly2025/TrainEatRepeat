@@ -145,6 +145,9 @@ public class TrainingService {
 
   private static int getDaysInPeriod(TimePeriod period, LocalDate today) {
     switch (period) {
+      case DAY -> {
+        return 1;
+      }
       case WEEK -> {
         var startOfWeek = today.with(java.time.DayOfWeek.MONDAY);
         return (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfWeek, today) + 1);
