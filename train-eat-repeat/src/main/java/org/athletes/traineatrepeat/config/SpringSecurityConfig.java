@@ -31,7 +31,12 @@ public class SpringSecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-        .formLogin(form -> form.usernameParameter("email").defaultSuccessUrl("/", true))
+        .formLogin(
+            form ->
+                form.loginPage("/login")
+                    .usernameParameter("email")
+                    .defaultSuccessUrl("/", true)
+                    .permitAll())
         .logout(logout -> logout.logoutSuccessUrl("/"))
         .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"))
         .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
