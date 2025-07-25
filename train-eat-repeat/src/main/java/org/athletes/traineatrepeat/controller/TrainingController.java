@@ -20,39 +20,33 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/training")
 public class TrainingController {
 
-  private final TrainingService trainingService;
+    private final TrainingService trainingService;
 
-  @PostMapping("/submit-training")
-  public TrainingRecordResponse submitTraining(
-      @RequestParam
-          @NotBlank
-          @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
-          @Valid
-          @RequestBody
-          TrainingRecordRequest request) {
-    return trainingService.submitTraining(request);
-  }
+    @PostMapping("/submit-training")
+    public TrainingRecordResponse submitTraining(@Valid @RequestBody TrainingRecordRequest request) {
+        return trainingService.submitTraining(request);
+    }
 
-  @GetMapping("/trainings")
-  public List<TrainingRecordResponse> getTrainings(
-      @RequestParam @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
-          String uuid,
-      @RequestParam(required = false) TimePeriod timePeriod) {
-    return trainingService.getTrainingsForUser(uuid, timePeriod);
-  }
+    @GetMapping("/trainings")
+    public List<TrainingRecordResponse> getTrainings(
+            @RequestParam @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+            String uuid,
+            @RequestParam(required = false) TimePeriod timePeriod) {
+        return trainingService.getTrainingsForUser(uuid, timePeriod);
+    }
 
-  @DeleteMapping("/{id}")
-  public void deleteTraining(
-      @PathVariable @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
-          String id) {
-    trainingService.deleteTrainingById(id);
-  }
+    @DeleteMapping("/{id}")
+    public void deleteTraining(
+            @PathVariable @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+            String id) {
+        trainingService.deleteTrainingById(id);
+    }
 
-  @PutMapping("/{id}")
-  public TrainingRecordResponse updateTraining(
-      @PathVariable @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
-          String id,
-      @Valid @RequestBody TrainingRecordRequest request) {
-    return trainingService.updateTrainingById(id, request);
-  }
+    @PutMapping("/{id}")
+    public TrainingRecordResponse updateTraining(
+            @PathVariable @NotBlank @Pattern(regexp = UUID_REGEX, message = "Invalid UUID format")
+            String id,
+            @Valid @RequestBody TrainingRecordRequest request) {
+        return trainingService.updateTrainingById(id, request);
+    }
 }
