@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>Training | TrainEatRepeat</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#f0f9ff',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8'
+                        },
+                        success: {
+                            50: '#f0fdf4',
+                            500: '#22c55e',
+                            600: '#16a34a'
+                        },
+                        warning: {
+                            50: '#fffbeb',
+                            500: '#f59e0b',
+                            600: '#d97706'
+                        },
+                        danger: {
+                            50: '#fef2f2',
+                            500: '#ef4444',
+                            600: '#dc2626'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, var(--tw-gradient-from) 0%, var(--tw-gradient-to) 100%);
+        }
+
+        .loading-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .slide-in {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .exercise-chip {
+            transition: all 0.2s ease;
+        }
+
+        .exercise-chip:hover {
+            transform: scale(1.02);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 font-sans">
+<!-- Modern Navigation -->
+<nav class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center h-16">
+            <!-- Logo/Brand -->
+            <div class="flex items-center space-x-4">
+                <div class="flex-shrink-0">
+                    <h1 class="text-2xl font-bold text-gray-900">
+                        <span class="text-primary-600">Train</span><span class="text-success-600">Eat</span><span class="text-warning-600">Repeat</span>
+                    </h1>
+                </div>
+            </div>
+
+            <!-- Navigation Links -->
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="/" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="home" class="w-4 h-4 inline mr-2"></i>Dashboard
+                </a>
+                <a href="/meals" class="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium transition-colors">
+                    <i data-lucide="utensils" class="w-4 h-4 inline mr-2"></i>Meals
+                </a>
+                <a href="/training" class="text-primary-600 bg-primary-50 px-3 py-2 rounded-md text-sm font-medium">
+                    <i data-lucide="dumbbell" class="w-4 h-4 inline mr-2"></i>Training
+                </a>
+            </div>
+
+            <!-- User Menu -->
+            <div class="flex items-center space-x-4">
+                <div class="text-sm text-gray-600" th:if="${user}">
+                    Welcome, <span class="font-medium text-gray-900" th:text="${user.username}">User</span>
+                </div>
+                <form th:action="@{/logout}" method="post" class="inline">
+                    <button type="submit" class="text-gray-600 hover:text-gray-900 p-2 rounded-md transition-colors">
+                        <i data-lucide="log-out" class="w-4 h-4"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900">Training Tracker</h1>
+                <p class="mt-2 text-gray-600">Log your workouts and track your fitness progress</p>
+            </div>
+
+            <!-- Time Period Filter -->
+            <div class="flex bg-white rounded-lg shadow-sm border p-1">
+                <button type="button" class="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md transition-all" data-period="DAY">
+                    Today
+                </button>
+                <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-md transition-all" data-period="WEEK">
+                    This Week
+                </button>
+                <button type="button" class="px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 rounded-md transition-all" data-period="MONTH">
+                    This Month
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Metrics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Calories Burned Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 font-medium">Avg Calories Burned</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="avg-calories-burned">0</p>
+                    <p class="text-xs text-gray-500 mt-1">per session</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-red-400 to-red-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="flame" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 font-medium">Training Sessions</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="total-sessions">0</p>
+                    <p class="text-xs text-gray-500 mt-1">completed</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-400 to-blue-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="activity" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Average Duration Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 font-medium">Avg Duration</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="avg-duration">0</p>
+                    <p class="text-xs text-gray-500 mt-1">minutes</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-green-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="clock" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sessions Per Day Card -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 card-hover">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 font-medium">Sessions Per Day</p>
+                    <p class="text-3xl font-bold text-gray-900 mt-1" id="sessions-per-day">0</p>
+                    <p class="text-xs text-gray-500 mt-1">average</p>
+                </div>
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-purple-600 rounded-lg flex items-center justify-center">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-white"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Training Section -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+        <div class="flex items-center mb-6">
+            <div class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg flex items-center justify-center mr-4">
+                <i data-lucide="plus" class="w-5 h-5 text-white"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-semibold text-gray-900">Log New Training Session</h2>
+                <p class="text-gray-600 text-sm">Track your workout with automatic calorie calculation</p>
+            </div>
+        </div>
+
+        <form id="add-training-form" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div>
+                    <label for="exercise-select" class="block text-sm font-medium text-gray-700 mb-2">Exercise</label>
+                    <select id="exercise-select" name="exercise" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" required>
+                        <option value="">Select exercise...</option>
+                    </select>
+                    <div class="invalid-feedback text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <div>
+                    <label for="duration" class="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                    <input type="number"
+                           id="duration"
+                           name="duration"
+                           step="0.1"
+                           min="0.1"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                           placeholder="30"
+                           required>
+                    <div class="invalid-feedback text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <div>
+                    <label for="training-date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date"
+                           id="training-date"
+                           name="date"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                    <p class="text-xs text-gray-500 mt-1">Leave empty for today</p>
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit"
+                            id="add-training-btn"
+                            class="w-full inline-flex items-center justify-center px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:ring-4 focus:ring-primary-200 transition-all">
+                        <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                        Log Training
+                    </button>
+                    <div id="training-loading-indicator" class="hidden w-full inline-flex items-center justify-center px-6 py-3 bg-gray-400 text-white font-medium rounded-lg">
+                        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                        Adding...
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Weekly Calories Burned Chart -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Weekly Calories Burned</h3>
+                <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <i data-lucide="bar-chart-3" class="w-4 h-4 text-gray-600"></i>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="weeklyCaloriesChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Exercise Distribution Chart -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Exercise Distribution</h3>
+                <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <i data-lucide="pie-chart" class="w-4 h-4 text-gray-600"></i>
+                </div>
+            </div>
+            <div class="h-64">
+                <canvas id="exerciseDistributionChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training History -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200">
+        <div class="p-6 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h3 class="text-lg font-semibold text-gray-900">Training History</h3>
+                    <p class="text-sm text-gray-600">Your workout sessions and progress</p>
+                </div>
+                <div class="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                    <i data-lucide="history" class="w-4 h-4 text-gray-600"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Exercise</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration (min)</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calories Burned</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+                </thead>
+                <tbody id="training-tbody" class="bg-white divide-y divide-gray-200">
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mb-4"></div>
+                            Loading training sessions...
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Exercise Management Section -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h3 class="text-lg font-semibold text-gray-900">Exercise Library</h3>
+                <p class="text-sm text-gray-600">Manage available exercises and their MET values</p>
+            </div>
+            <button onclick="openAddExerciseModal()" class="inline-flex items-center px-4 py-2 bg-success-600 text-white font-medium rounded-lg hover:bg-success-700 transition-colors">
+                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                Add Exercise
+            </button>
+        </div>
+
+        <div id="exercises-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Loading state -->
+            <div class="animate-pulse space-y-4">
+                <div class="h-20 bg-gray-200 rounded-lg"></div>
+                <div class="h-20 bg-gray-200 rounded-lg"></div>
+                <div class="h-20 bg-gray-200 rounded-lg"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Training Modal -->
+<div id="editTrainingModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 slide-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Edit Training Session</h3>
+                <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeEditTrainingModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="edit-training-form" class="space-y-4">
+                <input type="hidden" id="edit-training-id">
+
+                <div>
+                    <label for="edit-exercise-select" class="block text-sm font-medium text-gray-700 mb-2">Exercise</label>
+                    <select id="edit-exercise-select" name="exercise" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors" required>
+                    </select>
+                    <div class="invalid-feedback text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <div>
+                    <label for="edit-duration" class="block text-sm font-medium text-gray-700 mb-2">Duration (minutes)</label>
+                    <input type="number"
+                           id="edit-duration"
+                           name="duration"
+                           step="0.1"
+                           min="0.1"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                           required>
+                    <div class="invalid-feedback text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <div>
+                    <label for="edit-training-date" class="block text-sm font-medium text-gray-700 mb-2">Date</label>
+                    <input type="date"
+                           id="edit-training-date"
+                           name="date"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors">
+                </div>
+            </form>
+
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button"
+                        onclick="closeEditTrainingModal()"
+                        class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                    Cancel
+                </button>
+                <button type="button"
+                        id="save-training-changes"
+                        class="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Exercise Modal -->
+<div id="addExerciseModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 slide-in">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-lg font-semibold text-gray-900">Add New Exercise</h3>
+                <button type="button" class="text-gray-400 hover:text-gray-600 transition-colors" onclick="closeAddExerciseModal()">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form id="add-exercise-form" class="space-y-4">
+                <div>
+                    <label for="exercise-name" class="block text-sm font-medium text-gray-700 mb-2">Exercise Name</label>
+                    <input type="text"
+                           id="exercise-name"
+                           name="name"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                           placeholder="e.g., Running, Swimming"
+                           required>
+                    <div class="invalid-feedback text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+
+                <div>
+                    <label for="exercise-met" class="block text-sm font-medium text-gray-700 mb-2">MET Value</label>
+                    <input type="number"
+                           id="exercise-met"
+                           name="MET"
+                           step="0.1"
+                           min="0.1"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                           placeholder="8.0"
+                           required>
+                    <p class="text-xs text-gray-500 mt-1">Metabolic Equivalent of Task (higher = more intense)</p>
+                    <div class="invalid-feedback text-red-500 text-sm mt-1 hidden"></div>
+                </div>
+            </form>
+
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button"
+                        onclick="closeAddExerciseModal()"
+                        class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors">
+                    Cancel
+                </button>
+                <button type="button"
+                        onclick="submitAddExercise()"
+                        class="px-4 py-2 bg-success-600 text-white rounded-lg hover:bg-success-700 transition-colors">
+                    Add Exercise
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alert Container -->
+<div id="alert-container" class="fixed top-4 right-4 z-50 space-y-2"></div>
+
+<script th:inline="javascript">
+    const userUuid = /*[[${user.uuid}]]*/ '';
+    let currentPeriod = 'DAY';
+    let weeklyCaloriesChart, exerciseDistributionChart;
+    let exercises = [];
+
+    // Configuration
+    const config = {
+        debounceTime: 300,
+        alertTimeout: 5000,
+        endpoints: {
+            submitTraining: `/training/submit-training?uuid=${userUuid}`,
+            trainingStats: `/user/training-statistics?uuid=${userUuid}`,
+            trainingHistory: `/training/trainings?uuid=${userUuid}`,
+            updateTraining: (id) => `/training/${id}`,
+            deleteTraining: (id) => `/training/${id}`,
+            getAllExercises: '/exercises',
+            addExercise: '/exercises/submit-exercise',
+            updateExercise: (id) => `/exercises/${id}`,
+            deleteExercise: (id) => `/exercises/${id}`
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        lucide.createIcons();
+        if (!userUuid) {
+            showAlert('User not found', 'error');
+            return;
+        }
+
+        initializeCharts();
+        loadData();
+        setupEventListeners();
+    });
+
+    function setupEventListeners() {
+        // Time period buttons
+        document.querySelectorAll('[data-period]').forEach(button => {
+            button.addEventListener('click', function () {
+                // Update active state
+                document.querySelectorAll('[data-period]').forEach(btn => {
+                    btn.classList.remove('text-white', 'bg-primary-600');
+                    btn.classList.add('text-gray-600', 'hover:text-gray-900');
+                });
+                this.classList.remove('text-gray-600', 'hover:text-gray-900');
+                this.classList.add('text-white', 'bg-primary-600');
+
+                currentPeriod = this.dataset.period;
+                loadData();
+            });
+        });
+
+        // Add training form
+        document.getElementById('add-training-form').addEventListener('submit', handleAddTraining);
+
+        // Save training changes
+        document.getElementById('save-training-changes').addEventListener('click', handleUpdateTraining);
+    }
+
+    function loadData() {
+        loadExercises();
+        loadTrainingStatistics();
+        loadTrainingHistory();
+    }
+
+    async function loadExercises() {
+        try {
+            const response = await fetch(config.endpoints.getAllExercises);
+            if (!response.ok) throw new Error('Failed to load exercises');
+
+            exercises = await response.json();
+            populateExerciseSelects();
+            displayExercisesLibrary();
+
+        } catch (error) {
+            console.error('Error loading exercises:', error);
+            showAlert('Error loading exercises', 'error');
+        }
+    }
+
+    function populateExerciseSelects() {
+        const selects = [document.getElementById('exercise-select'), document.getElementById('edit-exercise-select')];
+
+        selects.forEach(select => {
+            // Clear existing options except the first one
+            select.innerHTML = '<option value="">Select exercise...</option>';
+
+            exercises.forEach(exercise => {
+                const option = document.createElement('option');
+                option.value = exercise.name;
+                option.textContent = `${exercise.name} (MET: ${exercise.MET})`;
+                select.appendChild(option);
+            });
+        });
+    }
+
+    function displayExercisesLibrary() {
+        const container = document.getElementById('exercises-container');
+
+        if (exercises.length === 0) {
+            container.innerHTML = `
+                <div class="col-span-full text-center py-8">
+                    <i data-lucide="dumbbell" class="w-12 h-12 text-gray-300 mx-auto mb-4"></i>
+                    <p class="text-gray-500">No exercises found</p>
+                    <p class="text-sm text-gray-400 mt-1">Add your first exercise to get started</p>
+                </div>
+            `;
+            lucide.createIcons();
+            return;
+        }
+
+        container.innerHTML = exercises.map(exercise => `
+            <div class="exercise-chip bg-gray-50 border border-gray-200 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h4 class="font-medium text-gray-900">${exercise.name}</h4>
+                        <p class="text-sm text-gray-600">MET: ${exercise.MET}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button onclick="editExercise('${exercise.id}', '${exercise.name}', ${exercise.MET})"
+                                class="p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteExercise('${exercise.id}')"
+                                class="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        lucide.createIcons();
+    }
+
+    async function handleAddTraining(e) {
+        e.preventDefault();
+
+        clearValidationErrors();
+
+        const formData = new FormData(e.target);
+        const trainingData = {
+            uuid: userUuid,
+            exercise: formData.get('exercise')?.trim(),
+            duration: parseFloat(formData.get('duration')),
+            caloriesLost: 0, // Will be calculated by backend
+            date: formData.get('date') || null
+        };
+
+        if (!trainingData.exercise) {
+            showFieldError('exercise-select', 'Please select an exercise');
+            return;
+        }
+
+        if (!trainingData.duration || trainingData.duration <= 0) {
+            showFieldError('duration', 'Duration must be greater than 0');
+            return;
+        }
+
+        toggleTrainingLoading(true);
+
+        try {
+            const response = await fetch('/training/submit-training', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: JSON.stringify(trainingData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || `Server error: ${response.status}`);
+            }
+
+            showAlert('Training session logged successfully!', 'success');
+            e.target.reset();
+            loadData();
+
+        } catch (error) {
+            console.error('Error adding training:', error);
+            showAlert(error.message || 'Error logging training session. Please try again.', 'error');
+        } finally {
+            toggleTrainingLoading(false);
+        }
+    }
+
+    async function loadTrainingStatistics() {
+        try {
+            let url = config.endpoints.trainingStats;
+            if (currentPeriod !== 'DAY') {
+                url += `&period=${currentPeriod}`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to load statistics');
+
+            const data = await response.json();
+
+            updateTrainingDisplay({
+                avgCaloriesBurnedPerSession: data.avgCaloriesBurnedPerSession || 0,
+                avgPerDaySessions: data.avgPerDaySessions || 0
+            });
+
+        } catch (error) {
+            console.error('Error loading training statistics:', error);
+            resetTrainingStats();
+        }
+    }
+
+    function updateTrainingDisplay(stats) {
+        document.getElementById('avg-calories-burned').textContent = Math.round(stats.avgCaloriesBurnedPerSession);
+        document.getElementById('sessions-per-day').textContent = stats.avgPerDaySessions.toFixed(1);
+    }
+
+    async function loadTrainingHistory() {
+        try {
+            let url = config.endpoints.trainingHistory;
+            if (currentPeriod !== 'DAY') {
+                url += `&timePeriod=${currentPeriod}`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to load training history');
+
+            const trainings = await response.json();
+
+            const tbody = document.getElementById('training-tbody');
+
+            if (trainings.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i data-lucide="dumbbell" class="w-12 h-12 text-gray-300 mb-4"></i>
+                                <p>No training sessions found for this period</p>
+                                <p class="text-sm text-gray-400 mt-1">Log your first workout above</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = trainings.map(training => createTrainingRow(training)).join('');
+
+                // Update additional stats
+                updateAdditionalStats(trainings);
+            }
+
+            lucide.createIcons();
+
+        } catch (error) {
+            console.error('Error loading training history:', error);
+            document.getElementById('training-tbody').innerHTML =
+                '<tr><td colspan="5" class="px-6 py-4 text-center text-red-500">Error loading training sessions</td></tr>';
+        }
+    }
+
+    function updateAdditionalStats(trainings) {
+        const totalSessions = trainings.length;
+        const totalDuration = trainings.reduce((sum, t) => sum + t.duration, 0);
+        const avgDuration = totalSessions > 0 ? totalDuration / totalSessions : 0;
+
+        document.getElementById('total-sessions').textContent = totalSessions;
+        document.getElementById('avg-duration').textContent = Math.round(avgDuration);
+    }
+
+    function createTrainingRow(training) {
+        return `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${training.date}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center mr-3">
+                            <i data-lucide="activity" class="w-4 h-4 text-primary-600"></i>
+                        </div>
+                        <span class="text-sm font-medium text-gray-900">${training.exercise}</span>
+                    </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600">${training.duration}</td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                        ${training.caloriesLost.toFixed(0)} cal
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                    <div class="flex space-x-2">
+                        <button onclick="editTraining('${training.id}', '${training.exercise}', ${training.duration}, '${training.date}')"
+                                class="inline-flex items-center p-2 text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors">
+                            <i data-lucide="edit-2" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="deleteTraining('${training.id}')"
+                                class="inline-flex items-center p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }
+
+    function initializeCharts() {
+        // Weekly Calories Burned Chart
+        const weeklyCtx = document.getElementById('weeklyCaloriesChart');
+        weeklyCaloriesChart = new Chart(weeklyCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Calories Burned',
+                    data: [0, 0, 0, 0, 0, 0, 0],
+                    backgroundColor: '#ef4444',
+                    borderRadius: 8,
+                    borderSkipped: false,
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: '#f3f4f6'
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            font: {
+                                family: 'Inter'
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Exercise Distribution Chart
+        const exerciseCtx = document.getElementById('exerciseDistributionChart');
+        exerciseDistributionChart = new Chart(exerciseCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [],
+                datasets: [{
+                    data: [],
+                    backgroundColor: [
+                        '#3b82f6', // Blue
+                        '#22c55e', // Green
+                        '#f59e0b', // Yellow
+                        '#ef4444', // Red
+                        '#8b5cf6', // Purple
+                        '#06b6d4', // Cyan
+                        '#f97316', // Orange
+                    ],
+                    borderWidth: 0,
+                    cutout: '60%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            padding: 20,
+                            usePointStyle: true,
+                            font: {
+                                family: 'Inter',
+                                size: 14
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Training CRUD Functions
+    function editTraining(id, exercise, duration, date) {
+        document.getElementById('edit-training-id').value = id;
+        document.getElementById('edit-exercise-select').value = exercise;
+        document.getElementById('edit-duration').value = duration;
+        document.getElementById('edit-training-date').value = date;
+        document.getElementById('editTrainingModal').classList.remove('hidden');
+    }
+
+    function closeEditTrainingModal() {
+        document.getElementById('editTrainingModal').classList.add('hidden');
+    }
+
+    async function handleUpdateTraining() {
+        clearValidationErrors();
+
+        const trainingData = {
+            uuid: userUuid,
+            exercise: document.getElementById('edit-exercise-select').value.trim(),
+            duration: parseFloat(document.getElementById('edit-duration').value),
+            caloriesLost: 0,
+            date: document.getElementById('edit-training-date').value || null
+        };
+
+        const id = document.getElementById('edit-training-id').value;
+
+        try {
+            const response = await fetch(config.endpoints.updateTraining(id), {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: JSON.stringify(trainingData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'Failed to update training');
+            }
+
+            closeEditTrainingModal();
+            showAlert('Training session updated successfully!', 'success');
+            loadData();
+
+        } catch (error) {
+            console.error('Error updating training:', error);
+            showAlert(error.message || 'Error updating training session.', 'error');
+        }
+    }
+
+    async function deleteTraining(id) {
+        if (!confirm('Are you sure you want to delete this training session?')) return;
+
+        try {
+            const response = await fetch(config.endpoints.deleteTraining(id), {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken()
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to delete training');
+
+            showAlert('Training session deleted successfully!', 'success');
+            loadData();
+
+        } catch (error) {
+            console.error('Error deleting training:', error);
+            showAlert('Error deleting training session.', 'error');
+        }
+    }
+
+    // Exercise CRUD Functions
+    function openAddExerciseModal() {
+        document.getElementById('addExerciseModal').classList.remove('hidden');
+    }
+
+    function closeAddExerciseModal() {
+        document.getElementById('addExerciseModal').classList.add('hidden');
+        document.getElementById('add-exercise-form').reset();
+    }
+
+    async function submitAddExercise() {
+        const formData = new FormData(document.getElementById('add-exercise-form'));
+        const exerciseData = {
+            name: formData.get('name')?.trim(),
+            MET: parseFloat(formData.get('MET'))
+        };
+
+        if (!exerciseData.name) {
+            showAlert('Exercise name is required', 'error');
+            return;
+        }
+
+        if (!exerciseData.MET || exerciseData.MET <= 0) {
+            showAlert('MET value must be greater than 0', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch(config.endpoints.addExercise, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: JSON.stringify(exerciseData)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => null);
+                throw new Error(errorData?.message || 'Failed to add exercise');
+            }
+
+            closeAddExerciseModal();
+            showAlert('Exercise added successfully!', 'success');
+            loadExercises();
+
+        } catch (error) {
+            console.error('Error adding exercise:', error);
+            showAlert(error.message || 'Error adding exercise.', 'error');
+        }
+    }
+
+    function editExercise(id, name, met) {
+        // You can implement edit exercise functionality similar to edit training
+        showAlert('Edit exercise functionality - coming soon!', 'info');
+    }
+
+    async function deleteExercise(id) {
+        if (!confirm('Are you sure you want to delete this exercise?')) return;
+
+        try {
+            const response = await fetch(config.endpoints.deleteExercise(id), {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken()
+                }
+            });
+
+            if (!response.ok) throw new Error('Failed to delete exercise');
+
+            showAlert('Exercise deleted successfully!', 'success');
+            loadExercises();
+
+        } catch (error) {
+            console.error('Error deleting exercise:', error);
+            showAlert('Error deleting exercise.', 'error');
+        }
+    }
+
+    // Utility Functions
+    function toggleTrainingLoading(isLoading) {
+        const addBtn = document.getElementById('add-training-btn');
+        const loadingIndicator = document.getElementById('training-loading-indicator');
+
+        if (isLoading) {
+            addBtn.classList.add('hidden');
+            loadingIndicator.classList.remove('hidden');
+        } else {
+            addBtn.classList.remove('hidden');
+            loadingIndicator.classList.add('hidden');
+        }
+    }
+
+    function showAlert(message, type) {
+        const container = document.getElementById('alert-container');
+
+        // Remove existing alerts of same type
+        container.querySelectorAll('.alert').forEach(alert => alert.remove());
+
+        const alertElement = document.createElement('div');
+        alertElement.className = `alert slide-in px-6 py-4 rounded-lg shadow-lg border-l-4 ${
+            type === 'success'
+                ? 'bg-green-50 border-green-400 text-green-700'
+                : type === 'info'
+                    ? 'bg-blue-50 border-blue-400 text-blue-700'
+                    : 'bg-red-50 border-red-400 text-red-700'
+        }`;
+
+        alertElement.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <i data-lucide="${type === 'success' ? 'check-circle' : type === 'info' ? 'info' : 'alert-circle'}" class="w-5 h-5 mr-3"></i>
+                    <span class="font-medium">${message}</span>
+                </div>
+                <button onclick="this.parentElement.parentElement.remove()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-4 h-4"></i>
+                </button>
+            </div>
+        `;
+
+        container.appendChild(alertElement);
+        lucide.createIcons();
+
+        // Auto-remove after timeout
+        setTimeout(() => {
+            if (alertElement.parentNode) {
+                alertElement.remove();
+            }
+        }, config.alertTimeout);
+    }
+
+    function showFieldError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        const feedback = field.parentNode.querySelector('.invalid-feedback');
+
+        field.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+        field.classList.remove('border-gray-300', 'focus:border-primary-500', 'focus:ring-primary-500');
+
+        if (feedback) {
+            feedback.textContent = message;
+            feedback.classList.remove('hidden');
+        }
+    }
+
+    function clearValidationErrors() {
+        document.querySelectorAll('input, select').forEach(field => {
+            field.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            field.classList.add('border-gray-300', 'focus:border-primary-500', 'focus:ring-primary-500');
+        });
+
+        document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+            feedback.classList.add('hidden');
+        });
+    }
+
+    function resetTrainingStats() {
+        ['avg-calories-burned', 'total-sessions', 'avg-duration', 'sessions-per-day'].forEach(id => {
+            document.getElementById(id).textContent = '0';
+        });
+    }
+
+    // Helper function to get CSRF token
+    function getCsrfToken() {
+        const tokenElement = document.querySelector('meta[name="_csrf"]');
+        return tokenElement ? tokenElement.getAttribute('content') : '';
+    }
+
+    // Close modals when clicking outside
+    document.getElementById('editTrainingModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditTrainingModal();
+        }
+    });
+
+    document.getElementById('addExerciseModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeAddExerciseModal();
+        }
+    });
+</script>
+</body>
+</html>

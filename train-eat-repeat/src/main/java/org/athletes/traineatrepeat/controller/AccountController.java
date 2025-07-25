@@ -28,4 +28,9 @@ public class AccountController {
       Model model) {
     return accountService.registerUser(registerDto, result, model);
   }
+
+  @GetMapping("/login")
+  public String login() {
+    return "login";
+  }
 }

@@ -23,6 +23,7 @@
       padding: 1.5rem;
       width: 100%;
       max-width: 360px;
+      position: relative;
     }
 
     .form-label {
@@ -40,6 +41,7 @@
       font-size: 0.9rem;
       padding: 0.5rem;
       border-radius: 0.45rem;
+      transition: all 0.3s ease;
     }
 
     .form-group {
@@ -59,11 +61,104 @@
     .text-muted a:hover {
       text-decoration: underline;
     }
+
+    .btn-loading {
+      position: relative;
+      color: transparent !important;
+    }
+
+    .btn-loading::after {
+      content: "";
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      top: 50%;
+      left: 50%;
+      margin-left: -8px;
+      margin-top: -8px;
+      border: 2px solid #ffffff;
+      border-radius: 50%;
+      border-top-color: transparent;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.85rem;
+      z-index: 1000;
+    }
+
+    .loading-overlay.show {
+      display: flex;
+    }
+
+    .loading-content {
+      text-align: center;
+      color: #6c757d;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #e3e3e3;
+      border-top: 4px solid #7b2ff7;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    .success-message {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      text-align: center;
+      position: absolute;
+      top: -80px;
+      left: 1.5rem;
+      right: 1.5rem;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.4s ease;
+      z-index: 1001;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    }
+
+    .success-message.show {
+      opacity: 1;
+      transform: translateY(0);
+      top: -60px;
+    }
   </style>
 </head>
 
 <body>
 <div class="form-container">
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <h5>Creating your account...</h5>
+      <p class="mb-0">Please wait while we set up everything for you</p>
+    </div>
+  </div>
+
+  <div class="success-message" id="successMessage">
+    <h6 class="mb-2">✅ Account Created Successfully!</h6>
+    <p class="mb-0">Redirecting to email verification...</p>
+  </div>
+
   <h2>Sign up</h2>
 
   <div th:if="${error}" class="alert alert-danger text-center" role="alert">
@@ -71,7 +166,7 @@
   </div>
 
   <!--/*@thymesVar id="registerRequest" type="org.athletes.traineatrepeat.model.request.RegisterRequest"*/-->
-  <form method="post" th:object="${registerRequest}">
+  <form method="post" th:object="${registerRequest}" id="registerForm">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
     <div class="form-group">
@@ -129,7 +224,9 @@
     </div>
 
     <div class="d-grid mt-3">
-      <button type="submit" class="btn btn-primary">Create Account</button>
+      <button type="submit" class="btn btn-primary" id="submitBtn">
+        <span id="btnText">Create Account</span>
+      </button>
     </div>
 
     <div class="text-center mt-2">
@@ -137,6 +234,56 @@
     </div>
   </form>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const successMessage = document.getElementById('successMessage');
+
+    form.addEventListener('submit', function(e) {
+      showLoadingState();
+
+      setTimeout(() => {
+      }, 100);
+    });
+
+    function showLoadingState() {
+      submitBtn.disabled = true;
+      submitBtn.classList.add('btn-loading');
+
+      setTimeout(() => {
+        loadingOverlay.classList.add('show');
+      }, 200);
+
+      setTimeout(() => {
+        if (!document.querySelector('.alert-danger')) {
+          showSuccessMessage();
+        }
+      }, 1500);
+    }
+
+    function showSuccessMessage() {
+      loadingOverlay.classList.remove('show');
+      successMessage.classList.add('show');
+    }
+
+    window.addEventListener('load', function() {
+      if (document.querySelector('.alert-danger')) {
+        resetLoadingState();
+      }
+    });
+
+    function resetLoadingState() {
+      submitBtn.disabled = false;
+      submitBtn.classList.remove('btn-loading');
+      loadingOverlay.classList.remove('show');
+      successMessage.classList.remove('show');
+    }
+  });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -1,5 +1,7 @@
 package org.athletes.traineatrepeat.service;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +41,8 @@ public class PasswordResetService {
       model.addAttribute(ERROR_ATTRIBUTE, errorMessage);
       return FORGOT_PASSWORD_PAGE;
     }
-    return "redirect:/forgot-password?success=true";
+    return "redirect:/forgot-password?success=true&email="
+        + URLEncoder.encode(request.email(), StandardCharsets.UTF_8);
   }
 
   public String prepareResetPasswordForm(String token, String email, Model model) {

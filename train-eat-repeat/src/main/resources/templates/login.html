@@ -28,6 +28,35 @@
         a:hover {
             text-decoration: underline;
         }
+        .forgot-password-link {
+            color: #6c757d;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+        .forgot-password-link:hover {
+            color: #2575fc;
+            text-decoration: underline;
+        }
+        .divider {
+            margin: 1rem 0;
+            text-align: center;
+            position: relative;
+        }
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e9ecef;
+        }
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -36,6 +65,21 @@
         <div class="col-md-4">
             <div class="card p-4">
                 <h3 class="text-center mb-4">Welcome Back</h3>
+
+                <!-- Success messages -->
+                <div th:if="${param.logout}" class="alert alert-success mt-3">
+                    You have been logged out.
+                </div>
+
+                <div th:if="${param.reset}" class="alert alert-success mt-3">
+                    Your password has been reset successfully. Please log in with your new password.
+                </div>
+
+                <!-- Error messages -->
+                <div th:if="${param.error}" class="alert alert-danger mt-3">
+                    Invalid username or password.
+                </div>
+
                 <form th:action="@{/login}" method="post">
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
@@ -45,16 +89,27 @@
                         <label for="password" class="form-label">Password</label>
                         <input id="password" type="password" name="password" class="form-control" required/>
                     </div>
+
+                    <!-- Remember me and Forgot password row -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="remember" name="remember-me">
+                            <label class="form-check-label" for="remember">
+                                Remember me
+                            </label>
+                        </div>
+                        <a href="/forgot-password" class="forgot-password-link">Forgot password?</a>
+                    </div>
+
                     <button type="submit" class="btn btn-primary w-100">Login</button>
                 </form>
-                <div class="text-center mt-3">
-                    <small>Don't have an account? <a th:href="@{/register}">Register</a></small>
+
+                <div class="divider">
+                    <span>or</span>
                 </div>
-                <div th:if="${param.error}" class="alert alert-danger mt-3">
-                    Invalid username or password.
-                </div>
-                <div th:if="${param.logout}" class="alert alert-success mt-3">
-                    You have been logged out.
+
+                <div class="text-center">
+                    <small class="text-muted">Don't have an account? <a th:href="@{/register}">Sign up here</a></small>
                 </div>
             </div>
         </div>

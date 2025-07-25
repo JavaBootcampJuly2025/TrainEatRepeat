@@ -80,6 +80,7 @@ public class AccountService {
     try {
       emailService.sendVerificationEmail(
           registerRequest.email(), registerRequest.username(), verificationCode);
+      Thread.sleep(500);
       return "redirect:/verify-email?email=" + registerRequest.email();
     } catch (Exception e) {
       model.addAttribute(ERROR_ATTRIBUTE, "Failed to send verification email. Please try again.");

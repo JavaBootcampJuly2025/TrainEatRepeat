@@ -53,4 +53,17 @@ public class HomeController {
     }
     return "meals";
   }
+
+  @GetMapping("/training")
+  public String training(Model model) {
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    String email = authentication.getName();
+    var user = userRepository.findByEmail(email);
+
+    if (user != null) {
+      UserResponse userResponse = userConverter.convertToUserDTO(user);
+      model.addAttribute("user", userResponse);
+    }
+    return "training";
+  }
 }
