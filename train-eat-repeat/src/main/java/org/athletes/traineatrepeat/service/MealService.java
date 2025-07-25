@@ -12,6 +12,7 @@ import org.athletes.traineatrepeat.model.request.MealRecordRequest;
 import org.athletes.traineatrepeat.model.response.MealRecordResponse;
 import org.athletes.traineatrepeat.model.response.UserNutritionStatisticsResponse;
 import org.athletes.traineatrepeat.repository.MealRecordRepository;
+import org.athletes.traineatrepeat.repository.UserRepository;
 import org.athletes.traineatrepeat.repository.dto.MealDTO;
 import org.athletes.traineatrepeat.util.TimeProvider;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class MealService {
   private final MealRecordRepository mealRecordRepository;
   private final MealRecordConverter mealRecordConverter;
   private final UsdaClient usdaClient;
+  private final UserRepository userRepository;
   private final TimeProvider timeProvider;
 
   private Map<Nutrients, Float> calculateNutritionalValues(String foodName, float weightInGrams) {
@@ -33,7 +35,7 @@ public class MealService {
     }
 
     float factor = calculateFactorByWeight(weightInGrams);
-    var nutritionMap = new HashMap<Nutrients, Float>();
+    var nutritionMap = new EnumMap<Nutrients, Float>(Nutrients.class);
 
     if (!CollectionUtils.isEmpty(usdaResponse.foods())) {
       var food = usdaResponse.foods().getFirst();
@@ -68,17 +70,17 @@ public class MealService {
     LocalDate today = timeProvider.getCurrentDate();
     var nutrition = calculateNutritionalValues(request.foodName(), request.weightInGrams());
     var mealToSave =
-        MealDTO.builder()
-            .id(UUID.randomUUID().toString())
-            .uuid(uuid)
-            .foodName(request.foodName())
-            .calories(nutrition.get(Nutrients.CALORIES))
-            .carbs(nutrition.get(Nutrients.CARBS))
-            .protein(nutrition.get(Nutrients.PROTEIN))
-            .fat(nutrition.get(Nutrients.FAT))
-            .weightInGrams(request.weightInGrams())
-            .date(request.date() != null ? request.date() : today)
-            .build();
+            MealDTO.builder()
+                    .id(UUID.randomUUID().toString())
+                    .uuid(uuid)
+                    .foodName(request.foodName())
+                    .calories(nutrition.get(Nutrients.CALORIES))
+                    .carbs(nutrition.get(Nutrients.CARBS))
+                    .protein(nutrition.get(Nutrients.PROTEIN))
+                    .fat(nutrition.get(Nutrients.FAT))
+                    .weightInGrams(request.weightInGrams())
+                    .date(request.date() != null ? request.date() : today)
+                    .build();
 
     var savedMeal = mealRecordRepository.save(mealToSave);
     return mealRecordConverter.toResponse(savedMeal);
@@ -142,6 +144,10 @@ public class MealService {
   }
 
   private List<MealDTO> getMealsFromTimePeriod(String uuid, TimePeriod timePeriod) {
+    if (!userRepository.existsById(uuid)) {
+      throw new TrainEatRepeatException("User not found with UUID: " + uuid);
+    }
+
     if (timePeriod == null) {
       return getMealsForToday(uuid);
     }
@@ -162,9 +168,9 @@ public class MealService {
   public MealRecordResponse updateMeal(String mealId, MealRecordRequest request) {
     LocalDate today = timeProvider.getCurrentDate();
     var existingMeal =
-        mealRecordRepository
-            .findById(mealId)
-            .orElseThrow(() -> new TrainEatRepeatException("Meal not found with ID: " + mealId));
+            mealRecordRepository
+                    .findById(mealId)
+                    .orElseThrow(() -> new TrainEatRepeatException("Meal not found with ID: " + mealId));
 
     existingMeal.setFoodName(request.foodName());
     existingMeal.setDate(request.date() != null ? request.date() : today);
