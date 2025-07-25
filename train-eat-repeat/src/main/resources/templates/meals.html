@@ -518,14 +518,17 @@
     async function loadNutritionStatistics() {
         try {
             let url = config.endpoints.nutritionStats;
-            if (currentPeriod !== 'DAY') {
-                url += `&period=${currentPeriod}`;
-            }
+
+            url += `&period=${currentPeriod}`;
+
+            console.log(`Loading nutrition stats for period: ${currentPeriod}`);
+            console.log(`API URL: ${url}`);
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to load statistics');
 
             const data = await response.json();
+            console.log(`Received data for ${currentPeriod}:`, data);
 
             updateNutritionDisplay({
                 avgCalories: data.avgCalories || 0,
@@ -549,30 +552,35 @@
         updateNutritionChart(stats);
     }
 
+    // Also update the loadMealsHistory function in meals.html to ensure consistency:
+
     async function loadMealsHistory() {
         try {
             let url = config.endpoints.mealsHistory;
-            if (currentPeriod !== 'DAY') {
-                url += `&timePeriod=${currentPeriod}`;
-            }
+
+            url += `&timePeriod=${currentPeriod}`;
+
+            console.log(`Loading meals history for period: ${currentPeriod}`);
+            console.log(`API URL: ${url}`);
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to load meals');
 
             const meals = await response.json();
+            console.log(`Received ${meals.length} meals for ${currentPeriod}`);
 
             const tbody = document.getElementById('meals-tbody');
             tbody.innerHTML = meals.length
                 ? meals.map(meal => createMealRow(meal)).join('')
                 : `<tr>
-                        <td colspan="8" class="px-6 py-12 text-center text-gray-500">
-                            <div class="flex flex-col items-center">
-                                <i data-lucide="utensils" class="w-12 h-12 text-gray-300 mb-4"></i>
-                                <p>No meals found for this period</p>
-                                <p class="text-sm text-gray-400 mt-1">Add your first meal above</p>
-                            </div>
-                        </td>
-                       </tr>`;
+                    <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <i data-lucide="utensils" class="w-12 h-12 text-gray-300 mb-4"></i>
+                            <p>No meals found for this period</p>
+                            <p class="text-sm text-gray-400 mt-1">Add your first meal above</p>
+                        </div>
+                    </td>
+                   </tr>`;
 
             lucide.createIcons();
 
@@ -582,7 +590,6 @@
                 '<tr><td colspan="8" class="px-6 py-4 text-center text-red-500">Error loading meals</td></tr>';
         }
     }
-
     function createMealRow(meal) {
         return `
                 <tr class="hover:bg-gray-50 transition-colors">

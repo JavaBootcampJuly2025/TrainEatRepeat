@@ -29,64 +29,67 @@ public class TrainingService {
 
   public TrainingRecordResponse submitTraining(TrainingRecordRequest request) {
     var user =
-        userRepository
-            .findById(request.uuid())
-            .orElseThrow(
-                () -> new TrainEatRepeatException("User not found with UUID: " + request.uuid()));
+            userRepository
+                    .findById(request.uuid())
+                    .orElseThrow(
+                            () -> new TrainEatRepeatException("User not found with UUID: " + request.uuid()));
 
     var exercise =
-        exerciseRepository
-            .findByNameIgnoreCase(request.exercise())
-            .orElseThrow(
-                () -> new TrainEatRepeatException("Exercise not found: " + request.exercise()));
+            exerciseRepository
+                    .findByNameIgnoreCase(request.exercise())
+                    .orElseThrow(
+                            () -> new TrainEatRepeatException("Exercise not found: " + request.exercise()));
 
     float calories = calculateCalories(exercise.getMet(), user.getWeight(), request.duration());
 
+    LocalDate trainingDate = request.date() != null ? request.date() : timeProvider.getCurrentDate();
+
     var trainingToSave =
-        TrainingDTO.builder()
-            .id(UUID.randomUUID().toString())
-            .uuid(user.getUuid())
-            .exercise(request.exercise())
-            .duration(request.duration())
-            .caloriesLost(calories)
-            .date(request.date())
-            .build();
+            TrainingDTO.builder()
+                    .id(UUID.randomUUID().toString())
+                    .uuid(user.getUuid())
+                    .exercise(request.exercise())
+                    .duration(request.duration())
+                    .caloriesLost(calories)
+                    .date(trainingDate)
+                    .build();
 
     var savedTraining = trainingRecordRepository.save(trainingToSave);
     return trainingRecordConverter.toResponse(savedTraining);
   }
 
   public TrainingRecordResponse updateTrainingById(
-      String trainingId, TrainingRecordRequest request) {
+          String trainingId, TrainingRecordRequest request) {
     var existingTraining =
-        trainingRecordRepository
-            .findById(trainingId)
-            .orElseThrow(
-                () -> new TrainEatRepeatException("Training not found with ID: " + trainingId));
+            trainingRecordRepository
+                    .findById(trainingId)
+                    .orElseThrow(
+                            () -> new TrainEatRepeatException("Training not found with ID: " + trainingId));
 
     var user =
-        userRepository
-            .findById(request.uuid())
-            .orElseThrow(
-                () -> new TrainEatRepeatException("User not found with UUID: " + request.uuid()));
+            userRepository
+                    .findById(request.uuid())
+                    .orElseThrow(
+                            () -> new TrainEatRepeatException("User not found with UUID: " + request.uuid()));
 
     var exercise =
-        exerciseRepository
-            .findByNameIgnoreCase(request.exercise())
-            .orElseThrow(
-                () -> new TrainEatRepeatException("Exercise not found: " + request.exercise()));
+            exerciseRepository
+                    .findByNameIgnoreCase(request.exercise())
+                    .orElseThrow(
+                            () -> new TrainEatRepeatException("Exercise not found: " + request.exercise()));
 
     float calories = calculateCalories(exercise.getMet(), user.getWeight(), request.duration());
+
+    LocalDate trainingDate = request.date() != null ? request.date() : timeProvider.getCurrentDate();
 
     existingTraining.setExercise(request.exercise());
     existingTraining.setDuration(request.duration());
     existingTraining.setCaloriesLost(calories);
-    existingTraining.setDate(request.date());
+    existingTraining.setDate(trainingDate);
 
     var updatedTraining = trainingRecordRepository.save(existingTraining);
     return trainingRecordConverter.toResponse(updatedTraining);
   }
-
   private float calculateCalories(float met, float weight, float durationInMinutes) {
     return (met * weight * 3.5f * durationInMinutes) / 200f;
   }
@@ -99,28 +102,45 @@ public class TrainingService {
    * @return lists of trainings per time period
    */
   public List<TrainingRecordResponse> getTrainingsForUser(String uuid, TimePeriod timePeriod) {
-    var trainings = getTrainingsFromTimePeriod(uuid, timePeriod);
+    List<TrainingDTO> trainings;
+
+    if (!userRepository.existsById(uuid)) {
+      throw new TrainEatRepeatException("User not found with UUID: " + uuid);
+    }
+
+    if (timePeriod == null) {
+      trainings = getTrainingsForToday(uuid);
+    } else {
+      trainings = getTrainingsFromTimePeriod(uuid, timePeriod);
+    }
+
     return trainings.stream().map(trainingRecordConverter::toResponse).toList();
   }
 
   public UserTrainingStatisticsResponse getTrainingStatistics(String uuid, TimePeriod period) {
-    var trainings = getTrainingsFromTimePeriod(uuid, period);
+    List<TrainingDTO> trainings;
+
+    if (period == null) {
+      trainings = getTrainingsForToday(uuid);
+    } else {
+      trainings = getTrainingsFromTimePeriod(uuid, period);
+    }
+
     double avgCaloriesBurned =
-        trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
+            trainings.stream().mapToDouble(TrainingDTO::getCaloriesLost).average().orElse(0);
 
     int daysInPeriod = 1;
     if (period != null) {
       LocalDate today = timeProvider.getCurrentDate();
-
       daysInPeriod = getDaysInPeriod(period, today);
     }
 
     float avgSessions = trainings.size() / (float) daysInPeriod;
 
     return UserTrainingStatisticsResponse.builder()
-        .avgCaloriesBurnedPerSession(avgCaloriesBurned)
-        .avgPerDaySessions(avgSessions)
-        .build();
+            .avgCaloriesBurnedPerSession(avgCaloriesBurned)
+            .avgPerDaySessions(avgSessions)
+            .build();
   }
 
   private static int getDaysInPeriod(TimePeriod period, LocalDate today) {
@@ -134,8 +154,8 @@ public class TrainingService {
         return (int) (java.time.temporal.ChronoUnit.DAYS.between(startOfMonth, today) + 1);
       }
       default ->
-          throw new TrainEatRepeatException(
-              "Invalid time period for training statistics: " + period);
+              throw new TrainEatRepeatException(
+                      "Invalid time period for training statistics: " + period);
     }
   }
 
@@ -145,7 +165,7 @@ public class TrainingService {
     }
 
     if (timePeriod == null) {
-      return trainingRecordRepository.findAllByUuid(uuid);
+      return getTrainingsForToday(uuid);
     }
     return switch (timePeriod) {
       case DAY -> getTrainingsForToday(uuid);
@@ -180,6 +200,6 @@ public class TrainingService {
     var endOfMonth = today.withDayOfMonth(today.lengthOfMonth());
 
     return trainingRecordRepository.findTrainingsByUuidAndDateBetween(
-        uuid, startOfMonth, endOfMonth);
+            uuid, startOfMonth, endOfMonth);
   }
 }

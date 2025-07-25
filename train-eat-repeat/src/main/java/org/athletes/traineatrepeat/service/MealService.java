@@ -94,7 +94,12 @@ public class MealService {
 
   public UserNutritionStatisticsResponse getNutritionStatistics(String uuid, TimePeriod period) {
 
-    var meals = getMealsFromTimePeriod(uuid, period);
+    List<MealDTO> meals;
+    if (period == null) {
+      meals = getMealsForToday(uuid);
+    } else {
+      meals = getMealsFromTimePeriod(uuid, period);
+    }
 
     double totalProtein = 0;
     double totalFat = 0;
@@ -113,12 +118,12 @@ public class MealService {
 
     if (count == 0) {
       return UserNutritionStatisticsResponse.builder()
-          .avgProtein(0)
-          .avgFat(0)
-          .avgCarbs(0)
-          .avgCalories(0)
-          .avgWeightInGrams(0)
-          .build();
+              .avgProtein(0)
+              .avgFat(0)
+              .avgCarbs(0)
+              .avgCalories(0)
+              .avgWeightInGrams(0)
+              .build();
     }
 
     double avgProtein = totalProtein / count;
@@ -128,17 +133,17 @@ public class MealService {
     double avgWeightInGrams = totalWeightInGrams / count;
 
     return UserNutritionStatisticsResponse.builder()
-        .avgProtein(avgProtein)
-        .avgFat(avgFat)
-        .avgCarbs(avgCarbs)
-        .avgCalories(avgCalories)
-        .avgWeightInGrams(avgWeightInGrams)
-        .build();
+            .avgProtein(avgProtein)
+            .avgFat(avgFat)
+            .avgCarbs(avgCarbs)
+            .avgCalories(avgCalories)
+            .avgWeightInGrams(avgWeightInGrams)
+            .build();
   }
 
   private List<MealDTO> getMealsFromTimePeriod(String uuid, TimePeriod timePeriod) {
     if (timePeriod == null) {
-      return mealRecordRepository.findAllByUuid(uuid);
+      return getMealsForToday(uuid);
     }
     return switch (timePeriod) {
       case DAY -> getMealsForToday(uuid);

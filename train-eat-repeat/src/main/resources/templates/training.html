@@ -526,7 +526,6 @@
         // Time period buttons
         document.querySelectorAll('[data-period]').forEach(button => {
             button.addEventListener('click', function () {
-                // Update active state
                 document.querySelectorAll('[data-period]').forEach(btn => {
                     btn.classList.remove('text-white', 'bg-primary-600');
                     btn.classList.add('text-gray-600', 'hover:text-gray-900');
@@ -550,6 +549,8 @@
         loadExercises();
         loadTrainingStatistics();
         loadTrainingHistory();
+        loadWeeklyCaloriesChart();
+        loadExerciseDistributionChart();
     }
 
     async function loadExercises() {
@@ -628,12 +629,14 @@
         clearValidationErrors();
 
         const formData = new FormData(e.target);
+        const dateValue = formData.get('date');
+
         const trainingData = {
             uuid: userUuid,
             exercise: formData.get('exercise')?.trim(),
             duration: parseFloat(formData.get('duration')),
-            caloriesLost: 0, // Will be calculated by backend
-            date: formData.get('date') || null
+            caloriesLost: 0,
+            date: dateValue && dateValue.trim() !== '' ? dateValue : null
         };
 
         if (!trainingData.exercise) {
@@ -678,14 +681,16 @@
     async function loadTrainingStatistics() {
         try {
             let url = config.endpoints.trainingStats;
-            if (currentPeriod !== 'DAY') {
-                url += `&period=${currentPeriod}`;
-            }
+            url += `&period=${currentPeriod}`;
+
+            console.log(`Loading training stats for period: ${currentPeriod}`); // Debug log
+            console.log(`API URL: ${url}`); // Debug log
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to load statistics');
 
             const data = await response.json();
+            console.log(`Received training data for ${currentPeriod}:`, data); // Debug log
 
             updateTrainingDisplay({
                 avgCaloriesBurnedPerSession: data.avgCaloriesBurnedPerSession || 0,
@@ -706,33 +711,33 @@
     async function loadTrainingHistory() {
         try {
             let url = config.endpoints.trainingHistory;
-            if (currentPeriod !== 'DAY') {
-                url += `&timePeriod=${currentPeriod}`;
-            }
+            url += `&timePeriod=${currentPeriod}`;
+
+            console.log(`Loading training history for period: ${currentPeriod}`);
+            console.log(`API URL: ${url}`);
 
             const response = await fetch(url);
             if (!response.ok) throw new Error('Failed to load training history');
 
             const trainings = await response.json();
+            console.log(`Received ${trainings.length} trainings for ${currentPeriod}`);
 
             const tbody = document.getElementById('training-tbody');
 
             if (trainings.length === 0) {
                 tbody.innerHTML = `
-                    <tr>
-                        <td colspan="5" class="px-6 py-12 text-center text-gray-500">
-                            <div class="flex flex-col items-center">
-                                <i data-lucide="dumbbell" class="w-12 h-12 text-gray-300 mb-4"></i>
-                                <p>No training sessions found for this period</p>
-                                <p class="text-sm text-gray-400 mt-1">Log your first workout above</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                        <div class="flex flex-col items-center">
+                            <i data-lucide="dumbbell" class="w-12 h-12 text-gray-300 mb-4"></i>
+                            <p>No training sessions found for this period</p>
+                            <p class="text-sm text-gray-400 mt-1">Log your first workout above</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
             } else {
                 tbody.innerHTML = trainings.map(training => createTrainingRow(training)).join('');
-
-                // Update additional stats
                 updateAdditionalStats(trainings);
             }
 
@@ -878,6 +883,98 @@
         });
     }
 
+    async function loadWeeklyCaloriesChart() {
+        try {
+            const response = await fetch(`${config.endpoints.trainingHistory}&timePeriod=WEEK`);
+            if (!response.ok) throw new Error('Failed to load weekly training data');
+
+            const trainings = await response.json();
+            const weeklyCaloriesData = processWeeklyCaloriesData(trainings);
+            updateWeeklyCaloriesChart(weeklyCaloriesData);
+
+        } catch (error) {
+            console.error('Error loading weekly calories chart:', error);
+            updateWeeklyCaloriesChart({});
+        }
+    }
+
+    function processWeeklyCaloriesData(trainings) {
+        const today = new Date();
+        const weeklyData = {};
+
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
+            const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+            weeklyData[dayName] = 0;
+        }
+
+        trainings.forEach(training => {
+            const trainingDate = new Date(training.date);
+            const dayName = trainingDate.toLocaleDateString('en-US', { weekday: 'short' });
+            if (weeklyData.hasOwnProperty(dayName)) {
+                weeklyData[dayName] += training.caloriesLost || 0;
+            }
+        });
+
+        return weeklyData;
+    }
+
+    function updateWeeklyCaloriesChart(data) {
+        if (weeklyCaloriesChart) {
+            const labels = Object.keys(data).length ? Object.keys(data) : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            const values = Object.keys(data).length ? Object.values(data) : [0, 0, 0, 0, 0, 0, 0];
+
+            weeklyCaloriesChart.data.labels = labels;
+            weeklyCaloriesChart.data.datasets[0].data = values;
+            weeklyCaloriesChart.update();
+        }
+    }
+
+    async function loadExerciseDistributionChart() {
+        try {
+            let url = `${config.endpoints.trainingHistory}`;
+            if (currentPeriod !== 'DAY') {
+                url += `&timePeriod=${currentPeriod}`;
+            } else {
+                url += `&timePeriod=DAY`;
+            }
+
+            const response = await fetch(url);
+            if (!response.ok) throw new Error('Failed to load training data for distribution');
+
+            const trainings = await response.json();
+            const distributionData = processExerciseDistributionData(trainings);
+            updateExerciseDistributionChart(distributionData);
+
+        } catch (error) {
+            console.error('Error loading exercise distribution chart:', error);
+            updateExerciseDistributionChart({ labels: [], data: [] });
+        }
+    }
+
+    function processExerciseDistributionData(trainings) {
+        const exerciseCount = {};
+
+        trainings.forEach(training => {
+            const exercise = training.exercise;
+            exerciseCount[exercise] = (exerciseCount[exercise] || 0) + 1;
+        });
+
+        const labels = Object.keys(exerciseCount);
+        const data = Object.values(exerciseCount);
+
+        return { labels, data };
+    }
+
+    function updateExerciseDistributionChart(distributionData) {
+        if (exerciseDistributionChart) {
+            exerciseDistributionChart.data.labels = distributionData.labels;
+            exerciseDistributionChart.data.datasets[0].data = distributionData.data;
+            exerciseDistributionChart.update();
+        }
+    }
+
     // Training CRUD Functions
     function editTraining(id, exercise, duration, date) {
         document.getElementById('edit-training-id').value = id;
@@ -894,12 +991,14 @@
     async function handleUpdateTraining() {
         clearValidationErrors();
 
+        const dateValue = document.getElementById('edit-training-date').value;
+
         const trainingData = {
             uuid: userUuid,
             exercise: document.getElementById('edit-exercise-select').value.trim(),
             duration: parseFloat(document.getElementById('edit-duration').value),
             caloriesLost: 0,
-            date: document.getElementById('edit-training-date').value || null
+            date: dateValue && dateValue.trim() !== '' ? dateValue : null
         };
 
         const id = document.getElementById('edit-training-id').value;
@@ -922,7 +1021,6 @@
             closeEditTrainingModal();
             showAlert('Training session updated successfully!', 'success');
             loadData();
-
         } catch (error) {
             console.error('Error updating training:', error);
             showAlert(error.message || 'Error updating training session.', 'error');
